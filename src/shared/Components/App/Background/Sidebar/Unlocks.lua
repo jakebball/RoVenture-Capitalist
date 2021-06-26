@@ -1,5 +1,6 @@
 local ReplicatedStorage = game.ReplicatedStorage
 
+
 local Vendor = ReplicatedStorage.Modules.Vendor
 
 local Roact = require(Vendor.Roact)
@@ -14,7 +15,11 @@ function Unlocks:render()
     return e(BaseButton, {
         text = "Unlocks",
         image = "rbxassetid://6996354725",
-        layoutorder = 1
+        layoutorder = 1,
+
+        onClick = function(rbx)
+            ReplicatedStorage.Sounds.ClickSound:Play()
+        end
     })
 end
 
