@@ -38,7 +38,9 @@ function App:render()
     }, {
         Background = e(Background, {
             setupAnimation = self.setupAnimations,
-            callAnimation = self.callAnimations
+            callAnimation = self.callAnimations,
+            frequency = 3,
+            dampingRatio = 0.85,
         })
     })
 end

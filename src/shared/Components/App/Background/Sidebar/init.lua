@@ -9,12 +9,13 @@ local Maid = require(Vendor.Maid)
 
 local Player = Players.LocalPlayer
 
-local Unlocks = require(script.Unlocks)
-local Upgrades = require(script.Upgrades)
-local Managers = require(script.Managers)
-local Investors = require(script.Investors)
-local Connect = require(script.Connect)
-local Shop = require(script.Shop)
+local Unlocks = require(script.UnlocksButton)
+local Upgrades = require(script.UpgradesButton)
+local Managers = require(script.ManagersButton)
+local Investors = require(script.InvestorsButton)
+local Businesses = require(script.BusinessesButton)
+local Shop = require(script.ShopButton)
+local LeaderboardButton = require(script.LeaderboardButton)
 
 local e = Roact.createElement
 
@@ -45,7 +46,7 @@ function Sidebar:render()
             ZIndex = 2
         },{
 
-            Background = e("ImageLabel", {
+            Background = e("ImageButton", {
                 Size = UDim2.new(1,0,1,0),
                 Position = UDim2.new(0.5, 0, 0.5, 0),
                 AnchorPoint = Vector2.new(0.5,0.5),
@@ -64,7 +65,9 @@ function Sidebar:render()
                 [Roact.Ref] = self.viewportRef,
             }, {
                 WorldModel = e("WorldModel"),
-            })
+            }),
+
+            LeaderboardButton = e(LeaderboardButton)
         }),
 
         ButtonList = e("Frame", {
@@ -88,7 +91,7 @@ function Sidebar:render()
 
             Investors = e(Investors),
 
-            Connect = e(Connect),
+            Businesses = e(Businesses),
 
             Shop = e(Shop)
         })
@@ -101,7 +104,7 @@ function Sidebar:didMount()
     local characterClone = ReplicatedStorage.CharacterModel:Clone()
     characterClone.Parent = viewport.WorldModel
     characterClone.HumanoidRootPart.Anchored = true
-
+    
     Promise.new(function(resolve)
         local humanoidDescription = Players:GetHumanoidDescriptionFromUserId(Player.UserId)
         characterClone.Humanoid:ApplyDescription(humanoidDescription)

@@ -3,6 +3,8 @@ local ReplicatedStorage = game.ReplicatedStorage
 local Vendor = ReplicatedStorage.Modules.Vendor
 
 local Roact = require(Vendor.Roact)
+local RoactRodux = require(Vendor.RoactRodux)
+
 local Flipper = require(Vendor.Flipper)
 
 local e = Roact.createElement
@@ -34,7 +36,14 @@ function BaseButton:render()
         ScaleType = Enum.ScaleType.Fit,
         LayoutOrder = self.props.layoutorder,
 
-        [Roact.Event.MouseButton1Click] = self.props.onClick,
+        [Roact.Event.MouseButton1Click] = function()
+            self.buttonSizeMotor:setGoal(Flipper.Spring.new(0, {
+                frequency = 5,
+                dampingRatio = 0.35
+            }))
+            ReplicatedStorage.Sounds.ClickSound:Play()
+            self.props.onClick()
+        end,
 
         [Roact.Event.MouseEnter] = function(rbx)
             self.buttonSizeMotor:setGoal(Flipper.Spring.new(1, {
@@ -62,6 +71,5 @@ function BaseButton:render()
         })
     })
 end
-
 
 return BaseButton

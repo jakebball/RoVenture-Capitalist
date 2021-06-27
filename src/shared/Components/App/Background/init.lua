@@ -9,6 +9,13 @@ local e = Roact.createElement
 local Background = Roact.Component:extend("Background")
 
 local Sidebar = require(script.Sidebar)
+local Businesses = require(script.Businesses)
+local Unlocks = require(script.Unlocks)
+local Upgrades = require(script.Upgrades)
+local Managers = require(script.Managers)
+local Investors = require(script.Investors)
+local Shop = require(script.Shop)
+local Leaderboard = require(script.Leaderboard)
 
 function Background:render()
     return e("Frame", {
@@ -28,6 +35,48 @@ function Background:render()
         Sidebar = e(Sidebar, {
             setupAnimations = self.props.setupAnimation,
             callAnimations = self.props.callAnimation,
+        }),
+
+        Businesses = e(Businesses, {
+            callAnimations = self.props.callAnimation,
+            frequency = self.props.frequency,
+            dampingRatio = self.props.dampingRatio
+        }),
+
+        Unlocks = e(Unlocks, {
+            callAnimations = self.props.callAnimation,
+            frequency = self.props.frequency,
+            dampingRatio = self.props.dampingRatio
+        }),
+
+        Upgrades = e(Upgrades, {
+            callAnimations = self.props.callAnimation,
+            frequency = self.props.frequency,
+            dampingRatio = self.props.dampingRatio
+        }),
+
+        Managers = e(Managers, {
+            callAnimations = self.props.callAnimation,
+            frequency = self.props.frequency,
+            dampingRatio = self.props.dampingRatio
+        }),
+
+        Investors = e(Investors, {
+            callAnimations = self.props.callAnimation,
+            frequency = self.props.frequency,
+            dampingRatio = self.props.dampingRatio
+        }),
+         
+        Shop = e(Shop, {
+            callAnimations = self.props.callAnimation,
+            frequency = self.props.frequency,
+            dampingRatio = self.props.dampingRatio
+        }),
+
+        Leaderboard = e(Leaderboard, {
+            callAnimations = self.props.callAnimation,
+            frequency = self.props.frequency,
+            dampingRatio = self.props.dampingRatio
         })
     })
 end
