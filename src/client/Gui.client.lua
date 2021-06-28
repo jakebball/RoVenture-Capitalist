@@ -14,7 +14,7 @@ local Reducers = require(ReplicatedStorage.Modules.Reducers)
 
 local reducer = Rodux.combineReducers({
     menu = Reducers.menuReducer,
-    business = Reducers.businessReducer
+    playerdata = Reducers.dataReducer
 })
 
 local store = Rodux.Store.new(reducer)

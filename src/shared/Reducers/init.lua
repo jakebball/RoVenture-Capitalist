@@ -17,13 +17,8 @@ local function shallowCopy(original)
 	return copy
 end
 
-local initialBusinessState = {
-    ["Venture1"] = {
-        Revenue = BusinessData.Begging_For_Robux.Initial_Revenue,
-        AmountBought = 1,
-        Time = BusinessData.Begging_For_Robux.Initial_Time,
-        Name = "Begging For Robux"
-    } 
+local initialdataState = {
+    
 }
 
 return {
@@ -33,29 +28,7 @@ return {
         end
     }),
 
-    businessReducer = Rodux.createReducer(initialBusinessState, {
-        setRevenue = function(state, action)
-            local newState = shallowCopy(state[action.businessname])
-
-            newState.Revenue = action.revenue
-
-            return newState
-        end,
-
-        setAmountBought = function(state, action)
-            local newState = shallowCopy(state[action.businessname])
-
-            newState.AmountBought = action.amountbought
-
-            return newState
-        end,
-
-        setTime = function(state, action)
-            local newState = shallowCopy(state[action.businessname])
-
-            newState.Time = action.time
-
-            return newState
-        end,
+    dataReducer = Rodux.createReducer(initialdataState, {
+       
     })
 }

@@ -12,15 +12,8 @@ local Businesses = Roact.Component:extend("Businesses")
 
 local BaseBusiness = require(script.BaseBusiness)
 
-function Businesses:init(initialProps)
-    self.positionMotor = Flipper.SingleMotor.new(1)
-    self.barVenture1Motor = Flipper.SingleMotor.new(0)
-    
-    self.backgroundPosition, self.updateBackgroundPosition = Roact.createBinding(self.positionMotor:getValue())
-    self.barVenture1Position, self.updateVenture1BarPosition = Roact.createBinding(self.barVenture1Motor:getValue())
-    
-    self.positionMotor:onStep(self.updateBackgroundPosition)
-    self.barVenture1Motor:onStep(self.updateVenture1BarPosition)
+function Businesses:init()
+   self:createBindings()
 end
 
 function Businesses:render()
@@ -79,12 +72,18 @@ function Businesses:render()
             BeggingForRobux = e(BaseBusiness, {
                 name = "Begging For Robux",
                 amount = "5.2",
-                onCircleClick = function()
-                    self.updateVenture1BarPosition(self.barVenture1Motor:setGoal(Flipper.Spring.new(1, {
-                        frequency = 3,
-                        dampingRatio = 1,
+                timeleft = "00:00:19",
+                cost = "500000",
+                amountbuying = "2",
+                
+                onCircleClick = function(rbx)
+                    local distance = -(rbx.Parent.TimeBarOutline.Outline.Position.X.Scale - (rbx.Parent.TimeBarOutline.Outline.Position.X.Scale + rbx.Parent.TimeBarOutline.Outline.Size.X.Scale))
+                    local time = 3
+                    self.updateVenture1BarPosition(self.barVenture1Motor:setGoal(Flipper.Linear.new(1, {
+                        velocity = distance / time
                     })))
                 end,
+
                 hiderPosition = self.barVenture1Position
             })
         })
@@ -105,11 +104,22 @@ function Businesses:didUpdate()
     end
 end
 
+function Businesses:createBindings()
+    self.positionMotor = Flipper.SingleMotor.new(1)
+    self.barVenture1Motor = Flipper.SingleMotor.new(0)
+    
+    self.backgroundPosition, self.updateBackgroundPosition = Roact.createBinding(self.positionMotor:getValue())
+    self.barVenture1Position, self.updateVenture1BarPosition = Roact.createBinding(self.barVenture1Motor:getValue())
+    
+    self.positionMotor:onStep(self.updateBackgroundPosition)
+    self.barVenture1Motor:onStep(self.updateVenture1BarPosition)
+end
+
 return RoactRodux.connect(
-    function(state, props)
+    function(state)
         return {
             menu = state.menu,
-            businesses = state.business
+            playerdata = state.playerdata
         }
     end,
     function(dispatch)
