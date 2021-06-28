@@ -20,19 +20,6 @@ function Shop:init()
 end
 
 function Shop:render()
-
-    if self.props.menu == "Shop" then
-        self.positionMotor:setGoal(Flipper.Spring.new(1, {
-            frequency = self.props.frequency,
-            dampingRatio = self.props.dampingRatio
-        }))
-    else
-        self.positionMotor:setGoal(Flipper.Spring.new(0, {
-            frequency = self.props.frequency,
-            dampingRatio = self.props.dampingRatio
-        })) 
-    end
-
     return e("Frame", {
         AnchorPoint = Vector2.new(0.5,0.5),
         BackgroundTransparency = 1,
@@ -74,6 +61,20 @@ function Shop:render()
             })
         })
     })
+end
+
+function Shop:didUpdate()
+    if self.props.menu == "Shop" then
+        self.positionMotor:setGoal(Flipper.Spring.new(1, {
+            frequency = self.props.frequency,
+            dampingRatio = self.props.dampingRatio
+        }))
+    else
+        self.positionMotor:setGoal(Flipper.Spring.new(0, {
+            frequency = self.props.frequency,
+            dampingRatio = self.props.dampingRatio
+        })) 
+    end
 end
 
 return RoactRodux.connect(

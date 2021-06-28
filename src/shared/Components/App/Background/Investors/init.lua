@@ -20,19 +20,6 @@ function Investors:init()
 end
 
 function Investors:render()
-
-    if self.props.menu == "Investors" then
-        self.positionMotor:setGoal(Flipper.Spring.new(1, {
-            frequency = self.props.frequency,
-            dampingRatio = self.props.dampingRatio
-        }))
-    else
-        self.positionMotor:setGoal(Flipper.Spring.new(0, {
-            frequency = self.props.frequency,
-            dampingRatio = self.props.dampingRatio
-        })) 
-    end
-
     return e("Frame", {
         AnchorPoint = Vector2.new(0.5,0.5),
         BackgroundTransparency = 1,
@@ -73,6 +60,20 @@ function Investors:render()
             })
         })
     })
+end
+
+function Investors:didUpdate()
+    if self.props.menu == "Investors" then
+        self.positionMotor:setGoal(Flipper.Spring.new(1, {
+            frequency = self.props.frequency,
+            dampingRatio = self.props.dampingRatio
+        }))
+    else
+        self.positionMotor:setGoal(Flipper.Spring.new(0, {
+            frequency = self.props.frequency,
+            dampingRatio = self.props.dampingRatio
+        })) 
+    end
 end
 
 return RoactRodux.connect(

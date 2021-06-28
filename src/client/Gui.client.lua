@@ -10,14 +10,11 @@ local App = require(ReplicatedStorage.Modules.Components.App)
 
 local PlayerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-local menuReducer = Rodux.createReducer("Businesses", {
-    setMenu = function(state, action)
-        return action.menu
-    end
-})
+local Reducers = require(ReplicatedStorage.Modules.Reducers)
 
 local reducer = Rodux.combineReducers({
-    menu = menuReducer
+    menu = Reducers.menuReducer,
+    business = Reducers.businessReducer
 })
 
 local store = Rodux.Store.new(reducer)
