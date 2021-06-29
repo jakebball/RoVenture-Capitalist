@@ -7,7 +7,7 @@ function MathUtil.Shorten(Input)
 	Input = math.abs(Input)
 
 	local Paired = false
-	for i,_ in pairs(MathUtil.Suffixes) do
+	for i,_ in ipairs(MathUtil.Suffixes) do
 		if not (Input >= 10^(3*i)) then
 			Input = Input / 10^(3*(i-1))
 			local isComplex = (string.find(tostring(Input),".") and string.sub(tostring(Input),4,4) ~= ".")
@@ -24,7 +24,21 @@ function MathUtil.Shorten(Input)
 	if Negative then
 		return "-"..Input
 	end
+
 	return Input
+end
+
+function MathUtil.ConvertToHMS(Seconds)
+	
+	local function Format(Int)
+		return string.format("%02i", Int)
+	end
+
+	local Minutes = (Seconds - Seconds%60)/60
+	Seconds = Seconds - Minutes*60
+	local Hours = (Minutes - Minutes%60)/60
+	Minutes = Minutes - Hours*60
+	return Format(Hours)..":"..Format(Minutes)..":"..Format(Seconds)
 end
 
 return MathUtil

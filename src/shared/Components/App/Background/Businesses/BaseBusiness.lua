@@ -5,6 +5,7 @@ local Vendor = ReplicatedStorage.Modules.Vendor
 local Roact = require(Vendor.Roact)
 local Flipper = require(Vendor.Flipper)
 local RoactFlipper = require(Vendor.RoactFlipper)
+local MathUtil = require(Vendor.MathUtil)
 
 local e = Roact.createElement
 
@@ -110,12 +111,12 @@ function BaseBusiness:render()
                 UICorner = e("UICorner")
             }),
 
-            Amount = e("TextLabel", {
+            Gain = e("TextLabel", {
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0.037, 0, 0, 0),
                 Size = UDim2.new(0.943, 0, 1, 0),
                 Font = Enum.Font.DenkOne,
-                Text = self.props.amount,
+                Text = MathUtil.Shorten(self.props.gain),
                 TextScaled = true,
                 TextColor3 = Color3.fromRGB(130,86,215),
                 ZIndex = 5
@@ -171,7 +172,7 @@ function BaseBusiness:render()
                     Position = UDim2.new(0.271, 0, 0.5, 0),
                     Size = UDim2.new(0.468, 0, 0.802, 0),
                     ZIndex = 7,
-                    Text = self.props.amountbuying,
+                    Text = "Buy x"..self.props.amountbuying,
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextScaled = true,
                     Font = Enum.Font.DenkOne
@@ -183,7 +184,7 @@ function BaseBusiness:render()
                     Position = UDim2.new(0.734, 0, 0.5, 0),
                     Size = UDim2.new(0.458, 0, 0.802, 0),
                     ZIndex = 7,
-                    Text = self.props.cost,
+                    Text = MathUtil.Shorten(self.props.cost),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextScaled = true,
                     Font = Enum.Font.DenkOne
@@ -197,7 +198,7 @@ function BaseBusiness:render()
             Size = UDim2.new(.254, 0, .261, 0),
             ZIndex = 8,
             BackgroundColor3 = Color3.fromRGB(255,141,10),
-            Text = self.props.timeleft,
+            Text = MathUtil.ConvertToHMS(self.props.time),
             TextColor3 = Color3.fromRGB(255,255,255),
             TextScaled = true,
             Font = Enum.Font.DenkOne
@@ -206,5 +207,6 @@ function BaseBusiness:render()
         })
     })
 end
+
 
 return BaseBusiness

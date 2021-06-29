@@ -5,6 +5,9 @@ local Vendor = ReplicatedStorage.Modules.Vendor
 local Roact = require(Vendor.Roact)
 local RoactRodux = require(Vendor.RoactRodux)
 local Flipper = require(Vendor.Flipper)
+local MathUtil = require(Vendor.MathUtil)
+
+local Calculator = require(ReplicatedStorage.Modules.Calculators)
 
 local e = Roact.createElement
 
@@ -13,7 +16,23 @@ local Businesses = Roact.Component:extend("Businesses")
 local BaseBusiness = require(script.BaseBusiness)
 
 function Businesses:init()
-   self:createBindings()
+    self:createBindings()
+end
+
+local function runBusiness(self, rbx)
+    local distance = -(rbx.Parent.TimeBarOutline.Outline.Position.X.Scale - (rbx.Parent.TimeBarOutline.Outline.Position.X.Scale + rbx.Parent.TimeBarOutline.Outline.Size.X.Scale))
+    local time = 3
+
+    self.updateVenture1BarPosition(self.barVenture1Motor:setGoal(Flipper.Linear.new(1, {
+        velocity = distance / time
+    })))
+    
+    local conn 
+    
+    conn = self.barVenture1Motor:onComplete(function()
+        self.updateVenture1BarPosition(self.barVenture1Motor:setGoal(Flipper.Instant.new(0)))
+        conn:Disconnect()
+    end)
 end
 
 function Businesses:render()
@@ -71,21 +90,27 @@ function Businesses:render()
 
             BeggingForRobux = e(BaseBusiness, {
                 name = "Begging For Robux",
-                amount = "5.2",
-                timeleft = "00:00:19",
-                cost = "500000",
-                amountbuying = "2",
+                gain = self.props.BeggingForRobux.gain,
+                time = self.props.BeggingForRobux.time,
+                cost = self.props.BeggingForRobux.cost,
+                amountbuying = self.props.BeggingForRobux.amountbuying,
                 
                 onCircleClick = function(rbx)
-                    local distance = -(rbx.Parent.TimeBarOutline.Outline.Position.X.Scale - (rbx.Parent.TimeBarOutline.Outline.Position.X.Scale + rbx.Parent.TimeBarOutline.Outline.Size.X.Scale))
-                    local time = 3
-                    self.updateVenture1BarPosition(self.barVenture1Motor:setGoal(Flipper.Linear.new(1, {
-                        velocity = distance / time
-                    })))
+                    runBusiness(self, rbx)
                 end,
 
                 hiderPosition = self.barVenture1Position
             })
+        }),
+
+        MoneyAmount = e("TextLabel", {
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0.025, 0, 0.036, 0),
+            Size = UDim2.new(0.22, 0, 0.091, 0),
+            Font = Enum.Font.DenkOne,
+            Text = MathUtil.Shorten(self.props.money).."$",
+            TextColor3 = Color3.fromRGB(255,255,255),
+            TextScaled = true
         })
     })
 end
@@ -113,18 +138,25 @@ function Businesses:createBindings()
     
     self.positionMotor:onStep(self.updateBackgroundPosition)
     self.barVenture1Motor:onStep(self.updateVenture1BarPosition)
+
 end
 
 return RoactRodux.connect(
     function(state)
         return {
             menu = state.menu,
-            playerdata = state.playerdata
+            money = state.playerdata.money,
+            BeggingForRobux = {
+                gain = 10000,
+                time = 100000,
+                cost = 5000000,
+                amountbuying = 10
+            }
         }
     end,
     function(dispatch)
         return {
-            onClick = function()
+            onRunClick = function()
                 dispatch({
                    
                 })

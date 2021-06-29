@@ -1,3 +1,10 @@
+--[[
+    economy formulas:
+
+    costOfBusiness = initial cost * (coefficient)^(numberAfterPurchasing - 1)
+]]
+
+
 return {
     Begging_For_Robux = {
         Initial_Cost = 3.738,
