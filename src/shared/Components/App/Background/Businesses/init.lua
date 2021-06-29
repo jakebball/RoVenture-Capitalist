@@ -1,5 +1,7 @@
 local ReplicatedStorage = game.ReplicatedStorage
 
+local RemoteEvents = ReplicatedStorage.RemoteEvents
+
 local Vendor = ReplicatedStorage.Modules.Vendor
 
 local Roact = require(Vendor.Roact)
@@ -19,19 +21,19 @@ function Businesses:init()
     self:createBindings()
 end
 
-local function runBusiness(self, rbx)
+local function runBusinessMotors(businessName, time, rbx, update, motor)
     local distance = -(rbx.Parent.TimeBarOutline.Outline.Position.X.Scale - (rbx.Parent.TimeBarOutline.Outline.Position.X.Scale + rbx.Parent.TimeBarOutline.Outline.Size.X.Scale))
-    local time = 3
-
-    self.updateVenture1BarPosition(self.barVenture1Motor:setGoal(Flipper.Linear.new(1, {
+    
+    update(motor:setGoal(Flipper.Linear.new(1, {
         velocity = distance / time
     })))
     
     local conn 
     
-    conn = self.barVenture1Motor:onComplete(function()
-        self.updateVenture1BarPosition(self.barVenture1Motor:setGoal(Flipper.Instant.new(0)))
-        conn:Disconnect()
+    conn = motor:onComplete(function()
+        update(motor:setGoal(Flipper.Instant.new(0)))
+        RemoteEvents.RunBusiness:FireServer(businessName)
+        conn:disconnect()
     end)
 end
 
@@ -96,7 +98,9 @@ function Businesses:render()
                 amountbuying = self.props.BeggingForRobux.amountbuying,
                 
                 onCircleClick = function(rbx)
-                    runBusiness(self, rbx)
+                    if self.props.BeggingForRobux.hasmanager == false then
+                        runBusinessMotors("BeggingForRobux", self.props.BeggingForRobux.time, rbx, self.updateVenture1BarPosition, self.barVenture1Motor, self.barVenture1Position)
+                    end
                 end,
 
                 hiderPosition = self.barVenture1Position
@@ -138,7 +142,6 @@ function Businesses:createBindings()
     
     self.positionMotor:onStep(self.updateBackgroundPosition)
     self.barVenture1Motor:onStep(self.updateVenture1BarPosition)
-
 end
 
 return RoactRodux.connect(
@@ -147,16 +150,17 @@ return RoactRodux.connect(
             menu = state.menu,
             money = state.playerdata.money,
             BeggingForRobux = {
-                gain = 10000,
-                time = 100000,
-                cost = 5000000,
-                amountbuying = 10
+                gain = state.business.BeggingForRobux.gain,
+                time = state.business.BeggingForRobux.time,
+                cost = state.business.BeggingForRobux.cost,
+                amountbuying = state.business.BeggingForRobux.amountbuying,
+                hasmanager = state.business.BeggingForRobux.hasmanager
             }
         }
     end,
     function(dispatch)
         return {
-            onRunClick = function()
+            onClick = function()
                 dispatch({
                    
                 })

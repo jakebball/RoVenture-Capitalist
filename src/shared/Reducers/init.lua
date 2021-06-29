@@ -53,7 +53,8 @@ local initialBusinessState = {
         gain = BusinessData.Begging_For_Robux.Initial_Revenue,
         time = BusinessData.Begging_For_Robux.Initial_Time,
         cost = BusinessData.Begging_For_Robux.Initial_Cost,
-        amountbuying = 1
+        amountbuying = 1,
+        hasmanager = false
     }
 }
 
