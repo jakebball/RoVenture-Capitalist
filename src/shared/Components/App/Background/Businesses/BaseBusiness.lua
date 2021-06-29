@@ -1,11 +1,16 @@
 local ReplicatedStorage = game.ReplicatedStorage
 
+local RemoteEvents = ReplicatedStorage.RemoteEvents
+
+local RunService = game:GetService("RunService")
+
 local Vendor = ReplicatedStorage.Modules.Vendor
 
 local Roact = require(Vendor.Roact)
 local Flipper = require(Vendor.Flipper)
 local RoactFlipper = require(Vendor.RoactFlipper)
 local MathUtil = require(Vendor.MathUtil)
+local SchedulerUtils = require(Vendor.SchedulerUtils)
 
 local e = Roact.createElement
 
@@ -17,6 +22,16 @@ function BaseBusiness:init()
 
     self.runButtonMotor = Flipper.SingleMotor.new(0)
     self.runButtonBinding = RoactFlipper.getBinding(self.runButtonMotor)
+
+    self.barMotor = Flipper.SingleMotor.new(0)
+    self.barPosition, self.updateBarPosition = Roact.createBinding(self.barMotor:getValue())
+    self.barMotor:onStep(self.updateBarPosition)
+
+    self.timeLeftBinding, self.updateTimeLeftBinding = Roact.createBinding(self.props.time)
+
+    self.motorRef = Roact.createRef()
+
+    self.lastTimeRan = 0
 end
 
 function BaseBusiness:render()
@@ -46,12 +61,16 @@ function BaseBusiness:render()
             ScaleType = Enum.ScaleType.Fit,
             ZIndex = 3,
 
-            [Roact.Event.MouseButton1Click] = function(rbx)
-                self.props.onCircleClick(rbx)
-                self.runButtonMotor:setGoal(Flipper.Spring.new(0, {
-                    frequency = 3,
-                    dampingRatio = 0.85
-                }))
+            [Roact.Ref] = self.motorRef,
+
+            [Roact.Event.MouseButton1Click] = function()
+                if self.props.hasmanager == false then
+                    self:runBusinessMotor()
+                    self.runButtonMotor:setGoal(Flipper.Spring.new(0, {
+                        frequency = 3,
+                        dampingRatio = 0.85
+                    }))
+                end
             end,
 
             [Roact.Event.MouseEnter] = function()
@@ -91,7 +110,7 @@ function BaseBusiness:render()
             Hider = e("Frame", {
                 AnchorPoint = Vector2.new(1,0.5),
                 Position = UDim2.new(1.02, 0, 0.5, 0),
-                Size = self.props.hiderPosition:map(function(value)
+                Size = self.barPosition:map(function(value)
                     if value ~= nil then
                         return UDim2.new(1,0,0.8,0):Lerp(UDim2.new(0.011, 0, 0.8, 0), value)
                     end
@@ -142,8 +161,6 @@ function BaseBusiness:render()
             end),
             TextTransparency = 1,
             ZIndex = 8,
-
-            [Roact.Event.MouseButton1Click] = self.props.onBuyClick,
             
             [Roact.Event.MouseEnter] = function()
                 self.buyButtonMotor:setGoal(Flipper.Spring.new(1, {
@@ -157,7 +174,9 @@ function BaseBusiness:render()
                     frequency = 3,
                     dampingRatio = 0.85
                 }))
-            end
+            end,
+
+            [Roact.Ref] = self.rbx
         }, {
             Background =  e("ImageLabel", {
                 BackgroundTransparency = 1,
@@ -198,7 +217,9 @@ function BaseBusiness:render()
             Size = UDim2.new(.254, 0, .261, 0),
             ZIndex = 8,
             BackgroundColor3 = Color3.fromRGB(255,141,10),
-            Text = MathUtil.ConvertToHMS(self.props.time),
+            Text = self.timeLeftBinding:map(function(value)
+                return MathUtil.ConvertToHMS(value)
+            end),
             TextColor3 = Color3.fromRGB(255,255,255),
             TextScaled = true,
             Font = Enum.Font.DenkOne
@@ -206,6 +227,50 @@ function BaseBusiness:render()
             UICorner = e("UICorner")
         })
     })
+end
+
+function BaseBusiness:runBusinessMotor()
+    if os.clock() - self.lastTimeRan <= self.props.time then
+        return
+    end
+
+    local rbx = self.motorRef:getValue()
+    local isActive = true
+
+    local distance = -(rbx.Parent.TimeBarOutline.Outline.Position.X.Scale - (rbx.Parent.TimeBarOutline.Outline.Position.X.Scale + rbx.Parent.TimeBarOutline.Outline.Size.X.Scale))
+    local velocity = distance / self.props.time
+
+    coroutine.wrap(function()
+        while isActive do
+            RunService.Heartbeat:Wait()
+            self.updateTimeLeftBinding(self.props.time - math.round(os.clock() - self.lastTimeRan))
+        end
+    end)()
+
+    self.updateBarPosition(self.barMotor:setGoal(Flipper.Linear.new(1, {
+        velocity = velocity
+    })))
+
+    local conn 
+    
+    conn = self.barMotor:onComplete(function()
+        self.updateBarPosition(self.barMotor:setGoal(Flipper.Instant.new(0)))
+        
+        conn:disconnect()
+        isActive = false
+    end) 
+
+    self.lastTimeRan = os.clock()
+end
+
+function BaseBusiness:didMount()
+    coroutine.wrap(function()
+        while RunService.Heartbeat:Wait() do
+            if self.props.hasmanager then
+                self:runBusinessMotor()
+            end
+        end
+    end)()
 end
 
 

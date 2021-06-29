@@ -21,22 +21,6 @@ function Businesses:init()
     self:createBindings()
 end
 
-local function runBusinessMotors(businessName, time, rbx, update, motor)
-    local distance = -(rbx.Parent.TimeBarOutline.Outline.Position.X.Scale - (rbx.Parent.TimeBarOutline.Outline.Position.X.Scale + rbx.Parent.TimeBarOutline.Outline.Size.X.Scale))
-    
-    update(motor:setGoal(Flipper.Linear.new(1, {
-        velocity = distance / time
-    })))
-    
-    local conn 
-    
-    conn = motor:onComplete(function()
-        update(motor:setGoal(Flipper.Instant.new(0)))
-        RemoteEvents.RunBusiness:FireServer(businessName)
-        conn:disconnect()
-    end)
-end
-
 function Businesses:render()
     return e("Frame", {
         AnchorPoint = Vector2.new(0.5,0.5),
@@ -96,14 +80,8 @@ function Businesses:render()
                 time = self.props.BeggingForRobux.time,
                 cost = self.props.BeggingForRobux.cost,
                 amountbuying = self.props.BeggingForRobux.amountbuying,
-                
-                onCircleClick = function(rbx)
-                    if self.props.BeggingForRobux.hasmanager == false then
-                        runBusinessMotors("BeggingForRobux", self.props.BeggingForRobux.time, rbx, self.updateVenture1BarPosition, self.barVenture1Motor, self.barVenture1Position)
-                    end
-                end,
-
-                hiderPosition = self.barVenture1Position
+                hasmanager = self.props.BeggingForRobux.hasmanager,
+                hiderPosition = self.barVenture1Position,
             })
         }),
 
@@ -135,14 +113,12 @@ end
 
 function Businesses:createBindings()
     self.positionMotor = Flipper.SingleMotor.new(1)
-    self.barVenture1Motor = Flipper.SingleMotor.new(0)
-    
+
     self.backgroundPosition, self.updateBackgroundPosition = Roact.createBinding(self.positionMotor:getValue())
-    self.barVenture1Position, self.updateVenture1BarPosition = Roact.createBinding(self.barVenture1Motor:getValue())
-    
+
     self.positionMotor:onStep(self.updateBackgroundPosition)
-    self.barVenture1Motor:onStep(self.updateVenture1BarPosition)
 end
+
 
 return RoactRodux.connect(
     function(state)

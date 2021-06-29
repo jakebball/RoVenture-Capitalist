@@ -3,6 +3,7 @@
         "incorrect-call-arguments"
     ],
     "Lua.diagnostics.globals": [
-        "UDim2"
+        "UDim2",
+        "task"
     ]
 }
