@@ -18,10 +18,11 @@ for k,_ in pairs(BusinessData) do
     Remote.Parent = RunBusiness
 end
 
-for _,remote in ipairs(ReplicatedStorage.RunBusiness:GetChildren()) do
+for _,remote in ipairs(ReplicatedStorage.RemoteEvents.RunBusiness:GetChildren()) do
     remote.OnServerEvent:Connect(function(player, businessName)
         
-    end
+    end)
 end
+
 
 return Network

@@ -4,44 +4,89 @@ local ReplicatedStorage = game.ReplicatedStorage
 
 local Vendor = ReplicatedStorage.Modules.Vendor
 
-local Reducers = require(ReplicatedStorage.Reducers)
+local Reducers = require(ReplicatedStorage.Modules.Reducers)
 
 local Rodux = require(Vendor.Rodux)
 local Promise = require(Vendor.Promise)
+local ProfileService = require(Vendor.ProfileService)
 
-local PlayerData = require(script.PlayerData)
 
 local Players = game:GetService("Players")
 
 local RoduxStoreCache = {}
+local ProfilesCache = {}
+
+local PROFILE_TEMPLATE = {
+    money = 0,
+    goldbars = 0
+}
+
+local GameProfileStore = ProfileService.GetProfileStore(
+    "PlayerData",
+    PROFILE_TEMPLATE
+)
+
+local reducer = Rodux.combineReducers({
+    menu = Reducers.menuReducer,
+    playerdata = Reducers.playerdataReducer,
+    business = Reducers.businessReducer
+})
 
 Players.PlayerRemoving:Connect(function(player)
     local store = RoduxStoreCache[player.UserId]
     if store ~= nil then
-        DataRunner._saveStoreData(store)
+        DataRunner._saveStoreData(player, store)
         store:destruct()
         store = nil
     end
 end)
 
+game.Players.PlayerAdded:Connect(function(player)
+    if RoduxStoreCache[player.UserId] == nil then
+        local store = Rodux.Store.new(reducer)
+        RoduxStoreCache[player.UserId] = store
+        DataRunner._loadStoreData(player, store)
+    end
+end)
+
 function DataRunner.getStore(player)
     local store = RoduxStoreCache[player.UserId]
-
-    if store == nil then
-        store = Rodux.Store.new(Reducers)
-        RoduxStoreCache[player.UserId] = store
-        DataRunner._loadStoreData(store)
-    end
-
     return store
 end
 
-function DataRunner._loadStoreData(store)
-    
+function DataRunner._loadStoreData(player, store)
+
+    local profile = GameProfileStore:LoadProfileAsync(
+        "Player-"..player.UserId,
+        "ForceLoad"
+    )
+
+    if profile ~= nil then
+        profile:Reconcile()
+        profile:ListenToRelease(function()
+            ProfilesCache[player.UserId] = nil
+            player:Kick()
+        end)
+
+        if Players:FindFirstChild(player.Name) then
+            ProfilesCache[player.UserId] = profile
+        else
+            profile:Release()
+        end
+    else
+        player:Kick("error loading data, please try again")
+    end
+
+    store:dispatch({
+        type = "setAll",
+        stats = profile.Data,
+    })
 end
 
-function DataRunner._saveStoreData(store)
-    
+function DataRunner._saveStoreData(player, store)
+    if ProfilesCache[player.UserId] ~= nil then
+        ProfilesCache[player.UserId].Data = store:getState()
+    end
 end
 
 return DataRunner

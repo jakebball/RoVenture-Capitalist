@@ -37,6 +37,10 @@ local playerdataReducer = Rodux.createReducer(initialDataState, {
         return newState
     end,
 
+    setAll = function(_, action)
+        return action.stats
+    end,
+
     increment = function(state, action)
         local newState = shallowCopy(state)
 
