@@ -31,6 +31,8 @@ function BaseBusiness:init()
 
     self.motorRef = Roact.createRef()
 
+    self.overflowAmount = 0
+
     self.lastTimeRan = 0
 end
 
@@ -234,31 +236,38 @@ function BaseBusiness:runBusinessMotor()
         return
     end
 
-    local rbx = self.motorRef:getValue()
-    local isActive = true
+    if self.props.time >= 0.5 then
+        local rbx = self.motorRef:getValue()
 
-    local distance = -(rbx.Parent.TimeBarOutline.Outline.Position.X.Scale - (rbx.Parent.TimeBarOutline.Outline.Position.X.Scale + rbx.Parent.TimeBarOutline.Outline.Size.X.Scale))
-    local velocity = distance / self.props.time
+        local distance = -(rbx.Parent.TimeBarOutline.Outline.Position.X.Scale - (rbx.Parent.TimeBarOutline.Outline.Position.X.Scale + rbx.Parent.TimeBarOutline.Outline.Size.X.Scale))
+        local velocity = distance / self.props.time
 
-    coroutine.wrap(function()
-        while isActive do
-            RunService.Heartbeat:Wait()
-            self.updateTimeLeftBinding(self.props.time - math.round(os.clock() - self.lastTimeRan))
-        end
-    end)()
+        local timeConn 
 
-    self.updateBarPosition(self.barMotor:setGoal(Flipper.Linear.new(1, {
-        velocity = velocity
-    })))
+        timeConn = RunService.Heartbeat:Connect(function()
+            local timeLeft = self.props.time * (1 - self.barMotor:getValue()) + 0 * self.barMotor:getValue()
+            self.updateTimeLeftBinding(timeLeft)
+        end)
 
-    local conn 
-    
-    conn = self.barMotor:onComplete(function()
-        self.updateBarPosition(self.barMotor:setGoal(Flipper.Instant.new(0)))
+        self.updateBarPosition(self.barMotor:setGoal(Flipper.Linear.new(1, {
+            velocity = velocity
+        })))
+
+        local barConn
         
-        conn:disconnect()
-        isActive = false
-    end) 
+        barConn = self.barMotor:onComplete(function()
+            self.updateBarPosition(self.barMotor:setGoal(Flipper.Instant.new(0)))
+            barConn:disconnect()
+            timeConn:Disconnect()
+            self.runButtonMotor:setGoal(Flipper.Spring.new(1, {
+                frequency = 3,
+                dampingRatio = 0.85
+            }))
+            RemoteEvents.RunBusiness[self.props.name]:FireServer()
+        end) 
+    else
+        self.overflowAmount += 1
+    end
 
     self.lastTimeRan = os.clock()
 end
@@ -271,7 +280,19 @@ function BaseBusiness:didMount()
             end
         end
     end)()
-end
 
+    coroutine.wrap(function()
+        while true do
+            RunService.Heartbeat:Wait()
+            if self.overflowAmount > 0 then
+                for _ = 0,self.overflowAmount,1 do
+                    SchedulerUtils.Wait(0.25)
+                    RemoteEvents.RunBusiness[self.props.name]:FireServer()
+                end
+                self.overflowAmount = 0
+            end
+        end
+    end)()
+end
 
 return BaseBusiness

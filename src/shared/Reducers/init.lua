@@ -25,7 +25,7 @@ local menuReducer = Rodux.createReducer("Businesses", {
 
 local initialDataState = {
     money = 0,
-    goldbars = 5
+    goldbars = 5,
 }
 
 local playerdataReducer = Rodux.createReducer(initialDataState, {
@@ -49,34 +49,37 @@ local playerdataReducer = Rodux.createReducer(initialDataState, {
 local initialBusinessState = {
     BeggingForRobux = {
         gain = BusinessData.Begging_For_Robux.Initial_Revenue,
-        time = 0.009375,
+        time = BusinessData.Begging_For_Robux.Initial_Time,
         cost = BusinessData.Begging_For_Robux.Initial_Cost,
         amountbuying = 1,
-        hasmanager = true
+        hasmanager = false,
+        playerOwnsBusiness = true,
     }
 }
 
 local businessReducer = Rodux.createReducer(initialBusinessState, {
-    set = function(state, action)
-        local newState = shallowCopy(state)
-
-        local businessState = shallowCopy(state[action.businessname])
-        newState[action.businessname] = businessState
-
-        businessState[action.dataname] = action.value
-
-        return newState
+    updateGain = function(state, action)
+        
     end,
 
-    increment = function(state, action)
-        local newState = shallowCopy(state)
+    updateTime = function(state, action)
+        
+    end,
 
-        local businessState = shallowCopy(state[action.businessname])
-        newState[action.businessname] = businessState
+    updateCost = function(state, action)
+        
+    end,
 
-        businessState[action.dataname] = action.value
+    updateAmountbuying = function(state, action)
+        
+    end,
 
-        return newState
+    setManager = function(state, action)
+        
+    end,
+
+    setOwnsBusiness = function(state, action)
+        
     end
 })
 

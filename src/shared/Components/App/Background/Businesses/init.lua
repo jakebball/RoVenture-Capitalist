@@ -1,15 +1,11 @@
 local ReplicatedStorage = game.ReplicatedStorage
 
-local RemoteEvents = ReplicatedStorage.RemoteEvents
-
 local Vendor = ReplicatedStorage.Modules.Vendor
 
 local Roact = require(Vendor.Roact)
 local RoactRodux = require(Vendor.RoactRodux)
 local Flipper = require(Vendor.Flipper)
 local MathUtil = require(Vendor.MathUtil)
-
-local Calculator = require(ReplicatedStorage.Modules.Calculators)
 
 local e = Roact.createElement
 
@@ -93,7 +89,28 @@ function Businesses:render()
             Text = MathUtil.Shorten(self.props.money).."$",
             TextColor3 = Color3.fromRGB(255,255,255),
             TextScaled = true
-        })
+        }),
+
+        --TO DO IN LATER UPDATE
+            -- BuyingAmount = e("ImageButton", {
+            --     AnchorPoint = Vector2.new(0.5,0.5),
+            --     BackgroundTransparency = 1,
+            --     Position = UDim2.new(0,0,0.001,0),
+            --     Size = UDim2.new(0.148, 0, 0.137, 0),
+            --     Image = "rbxassetid://7042822718",
+            --     ScaleType = Enum.ScaleType.Fit,
+            --     Rotation = 25,
+            -- }, {
+            --     Label = e("TextLabel", {
+            --         AnchorPoint = Vector2.new(0.5, 0.5),
+            --         BackgroundTransparency = 1,
+            --         Position = UDim2.new(0.517, 0, 0.468, 0),
+            --         Rotation = -25,
+            --         Size = UDim2.new(0.523, 0, 0.594, 0),
+            --         Font = Enum.Font.DenkOne,
+            --         Text = "x1"
+            --     })
+            -- })
     })
 end
 
@@ -130,13 +147,14 @@ return RoactRodux.connect(
                 time = state.business.BeggingForRobux.time,
                 cost = state.business.BeggingForRobux.cost,
                 amountbuying = state.business.BeggingForRobux.amountbuying,
-                hasmanager = state.business.BeggingForRobux.hasmanager
+                hasmanager = state.business.BeggingForRobux.hasmanager,
+                playerOwnsBusiness = true
             }
         }
     end,
     function(dispatch)
         return {
-            onClick = function()
+            onChangeBuyAmount = function()
                 dispatch({
                    
                 })
