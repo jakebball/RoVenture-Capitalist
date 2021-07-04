@@ -19,10 +19,24 @@ for k,_ in pairs(BusinessData) do
 end
 
 for _,remote in ipairs(ReplicatedStorage.RemoteEvents.RunBusiness:GetChildren()) do
-    remote.OnServerEvent:Connect(function(player, businessName)
+    remote.OnServerEvent:Connect(function(player)
+
+        local store = DataRunner.getStore(player)
+
+        local businessName = string.gsub(remote.Name, " ", "")
+    
+        local businessState = store:getState().business[businessName]
         
+        store:dispatch({
+            type = "increment",
+            statname = "money",
+            value = businessState.gain
+        })
     end)
 end
+
+
+
 
 
 return Network

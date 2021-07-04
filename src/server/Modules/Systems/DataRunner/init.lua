@@ -16,14 +16,9 @@ local Players = game:GetService("Players")
 local RoduxStoreCache = {}
 local ProfilesCache = {}
 
-local PROFILE_TEMPLATE = {
-    money = 0,
-    goldbars = 0
-}
-
 local GameProfileStore = ProfileService.GetProfileStore(
     "PlayerData",
-    PROFILE_TEMPLATE
+    {}
 )
 
 local reducer = Rodux.combineReducers({
@@ -43,7 +38,7 @@ end)
 
 game.Players.PlayerAdded:Connect(function(player)
     if RoduxStoreCache[player.UserId] == nil then
-        local store = Rodux.Store.new(reducer)
+        local store = Rodux.Store.new(reducer, {}, {Rodux.loggerMiddleware})
         RoduxStoreCache[player.UserId] = store
         DataRunner._loadStoreData(player, store)
     end

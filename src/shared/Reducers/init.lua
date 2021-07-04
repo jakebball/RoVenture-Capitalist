@@ -67,7 +67,11 @@ local businessReducer = Rodux.createReducer(initialBusinessState, {
     end,
 
     updateTime = function(state, action)
-        
+        local newState = shallowCopy(state)
+
+        -- newState[action.businessname]
+
+        return newState
     end,
 
     updateCost = function(state, action)
