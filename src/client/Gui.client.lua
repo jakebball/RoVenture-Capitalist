@@ -1,6 +1,7 @@
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Vendor = ReplicatedStorage.Modules.Vendor
+local RemoteEvents = ReplicatedStorage.RemoteEvents
 
 local Roact = require(Vendor.Roact)
 local Rodux = require(Vendor.Rodux)
@@ -25,3 +26,15 @@ Roact.mount(Roact.createElement(RoactRodux.StoreProvider, {
 }, {
     App = Roact.createElement(App)
 }), PlayerGui, "RoVenture Capitalist")
+
+RemoteEvents.Updates.UpdateStore.OnClientEvent:Connect(function(newState)
+    store:dispatch({
+        type = "setAllBusiness",
+        newState = newState.business
+    })
+
+    store:dispatch({
+        type = "setAll",
+        stats = newState.playerdata
+    })
+end)

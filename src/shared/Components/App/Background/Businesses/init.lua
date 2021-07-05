@@ -78,6 +78,7 @@ function Businesses:render()
                 amountbuying = self.props.BeggingForRobux.amountbuying,
                 hasmanager = self.props.BeggingForRobux.hasmanager,
                 hiderPosition = self.barVenture1Position,
+                onFinishRun = self.props.onFinishRun
             })
         }),
 
@@ -90,27 +91,6 @@ function Businesses:render()
             TextColor3 = Color3.fromRGB(255,255,255),
             TextScaled = true
         }),
-
-        --TO DO IN LATER UPDATE
-            -- BuyingAmount = e("ImageButton", {
-            --     AnchorPoint = Vector2.new(0.5,0.5),
-            --     BackgroundTransparency = 1,
-            --     Position = UDim2.new(0,0,0.001,0),
-            --     Size = UDim2.new(0.148, 0, 0.137, 0),
-            --     Image = "rbxassetid://7042822718",
-            --     ScaleType = Enum.ScaleType.Fit,
-            --     Rotation = 25,
-            -- }, {
-            --     Label = e("TextLabel", {
-            --         AnchorPoint = Vector2.new(0.5, 0.5),
-            --         BackgroundTransparency = 1,
-            --         Position = UDim2.new(0.517, 0, 0.468, 0),
-            --         Rotation = -25,
-            --         Size = UDim2.new(0.523, 0, 0.594, 0),
-            --         Font = Enum.Font.DenkOne,
-            --         Text = "x1"
-            --     })
-            -- })
     })
 end
 
@@ -152,11 +132,14 @@ return RoactRodux.connect(
             }
         }
     end,
+
     function(dispatch)
         return {
-            onChangeBuyAmount = function()
+            onFinishRun = function(value)
                 dispatch({
-                   
+                   type = "increment",
+                   statname = "money",
+                   value = value
                 })
             end,
         }

@@ -88,6 +88,10 @@ local businessReducer = Rodux.createReducer(initialBusinessState, {
 
     setOwnsBusiness = function(state, action)
         
+    end,
+
+    setAllBusiness = function(_, action)
+        return action.newState
     end
 })
 

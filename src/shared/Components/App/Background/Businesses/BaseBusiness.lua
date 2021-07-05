@@ -264,6 +264,7 @@ function BaseBusiness:runBusinessMotor()
                 dampingRatio = 0.85
             }))
             RemoteEvents.RunBusiness[self.props.name]:FireServer()
+            self.props.onFinishRun(self.props.gain)
         end) 
     else
         self.overflowAmount += 1

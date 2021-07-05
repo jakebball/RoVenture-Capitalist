@@ -3,13 +3,13 @@ local DataRunner = {}
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Vendor = ReplicatedStorage.Modules.Vendor
+local RemoteEvents = ReplicatedStorage.RemoteEvents
 
 local Reducers = require(ReplicatedStorage.Modules.Reducers)
 
 local Rodux = require(Vendor.Rodux)
 local Promise = require(Vendor.Promise)
 local ProfileService = require(Vendor.ProfileService)
-
 
 local Players = game:GetService("Players")
 
@@ -18,7 +18,10 @@ local ProfilesCache = {}
 
 local GameProfileStore = ProfileService.GetProfileStore(
     "PlayerData",
-    {}
+    {
+        money = 0,
+        goldbars = 0
+    }
 )
 
 local reducer = Rodux.combineReducers({
@@ -38,7 +41,7 @@ end)
 
 game.Players.PlayerAdded:Connect(function(player)
     if RoduxStoreCache[player.UserId] == nil then
-        local store = Rodux.Store.new(reducer, {}, {Rodux.loggerMiddleware})
+        local store = Rodux.Store.new(reducer)
         RoduxStoreCache[player.UserId] = store
         DataRunner._loadStoreData(player, store)
     end
@@ -65,17 +68,21 @@ function DataRunner._loadStoreData(player, store)
 
         if Players:FindFirstChild(player.Name) then
             ProfilesCache[player.UserId] = profile
+
+            store:dispatch({
+                type = "setAll",
+                stats = profile.Data,
+            })
+
+            store.changed:connect(function(state)
+                RemoteEvents.Updates.UpdateStore:FireAllClients(state)
+            end)
         else
             profile:Release()
         end
     else
         player:Kick("error loading data, please try again")
     end
-
-    store:dispatch({
-        type = "setAll",
-        stats = profile.Data,
-    })
 end
 
 function DataRunner._saveStoreData(player, store)
