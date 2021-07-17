@@ -31,8 +31,6 @@ function BaseBusiness:init()
 
     self.motorRef = Roact.createRef()
 
-    self.overflowAmount = 0
-
     self.lastTimeRan = 0
 end
 
@@ -137,7 +135,7 @@ function BaseBusiness:render()
                 Position = UDim2.new(0.037, 0, 0, 0),
                 Size = UDim2.new(0.943, 0, 1, 0),
                 Font = Enum.Font.DenkOne,
-                Text = MathUtil.Shorten(self.props.gain),
+                Text = MathUtil.Shorten(self.props.gain).."$",
                 TextScaled = true,
                 TextColor3 = Color3.fromRGB(130,86,215),
                 ZIndex = 5
@@ -178,6 +176,23 @@ function BaseBusiness:render()
                 }))
             end,
 
+            [Roact.Event.MouseButton1Click] = function()
+                if self.props.playermoney >= self.props.cost then
+                    RemoteEvents.BuyItems.BuyBusiness:FireServer(self.props.name)
+                    
+                    self.props.dispatchAction({
+                        type = "increment",
+                        statname = "money",
+                        value = -(self.props.cost)
+                    })
+
+                    self.buyButtonMotor:setGoal(Flipper.Spring.new(0, {
+                        frequency = 3,
+                        dampingRatio = 0.85
+                    }))
+                end
+            end,
+
             [Roact.Ref] = self.rbx
         }, {
             Background =  e("ImageLabel", {
@@ -193,7 +208,7 @@ function BaseBusiness:render()
                     Position = UDim2.new(0.271, 0, 0.5, 0),
                     Size = UDim2.new(0.468, 0, 0.802, 0),
                     ZIndex = 7,
-                    Text = "Buy x"..self.props.amountbuying,
+                    Text = "Buy",
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextScaled = true,
                     Font = Enum.Font.DenkOne
@@ -205,7 +220,7 @@ function BaseBusiness:render()
                     Position = UDim2.new(0.734, 0, 0.5, 0),
                     Size = UDim2.new(0.458, 0, 0.802, 0),
                     ZIndex = 7,
-                    Text = MathUtil.Shorten(self.props.cost),
+                    Text = MathUtil.Shorten(self.props.cost).."$",
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextScaled = true,
                     Font = Enum.Font.DenkOne
@@ -236,39 +251,39 @@ function BaseBusiness:runBusinessMotor()
         return
     end
 
-    if self.props.time >= 0.5 then
-        local rbx = self.motorRef:getValue()
+    local rbx = self.motorRef:getValue()
 
-        local distance = -(rbx.Parent.TimeBarOutline.Outline.Position.X.Scale - (rbx.Parent.TimeBarOutline.Outline.Position.X.Scale + rbx.Parent.TimeBarOutline.Outline.Size.X.Scale))
-        local velocity = distance / self.props.time
+    local distance = -(rbx.Parent.TimeBarOutline.Outline.Position.X.Scale - (rbx.Parent.TimeBarOutline.Outline.Position.X.Scale + rbx.Parent.TimeBarOutline.Outline.Size.X.Scale))
+    local velocity = distance / self.props.time
 
-        local timeConn 
+    local timeConn 
 
-        timeConn = RunService.Heartbeat:Connect(function()
-            local timeLeft = self.props.time * (1 - self.barMotor:getValue()) + 0 * self.barMotor:getValue()
-            self.updateTimeLeftBinding(timeLeft)
-        end)
+    timeConn = RunService.Heartbeat:Connect(function()
+        local timeLeft = self.props.time * (1 - self.barMotor:getValue()) + 0 * self.barMotor:getValue()
+        self.updateTimeLeftBinding(timeLeft)
+    end)
 
-        self.updateBarPosition(self.barMotor:setGoal(Flipper.Linear.new(1, {
-            velocity = velocity
-        })))
+    self.updateBarPosition(self.barMotor:setGoal(Flipper.Linear.new(1, {
+        velocity = velocity
+    })))
 
-        local barConn
-        
-        barConn = self.barMotor:onComplete(function()
-            self.updateBarPosition(self.barMotor:setGoal(Flipper.Instant.new(0)))
-            barConn:disconnect()
-            timeConn:Disconnect()
-            self.runButtonMotor:setGoal(Flipper.Spring.new(1, {
-                frequency = 3,
-                dampingRatio = 0.85
-            }))
-            RemoteEvents.RunBusiness[self.props.name]:FireServer()
-            self.props.onFinishRun(self.props.gain)
-        end) 
-    else
-        self.overflowAmount += 1
-    end
+    local barConn
+    
+    barConn = self.barMotor:onComplete(function()
+        self.updateBarPosition(self.barMotor:setGoal(Flipper.Instant.new(0)))
+        barConn:disconnect()
+        timeConn:Disconnect()
+        self.runButtonMotor:setGoal(Flipper.Spring.new(1, {
+            frequency = 3,
+            dampingRatio = 0.85
+        }))
+        RemoteEvents.RunBusiness[self.props.name]:FireServer()
+        self.props.dispatchAction({
+            type = "increment",
+            statname = "money",
+            value = self.props.gain
+         })
+    end) 
 
     self.lastTimeRan = os.clock()
 end
@@ -276,21 +291,11 @@ end
 function BaseBusiness:didMount()
     coroutine.wrap(function()
         while RunService.Heartbeat:Wait() do
+            wait(1)
             if self.props.hasmanager then
-                self:runBusinessMotor()
-            end
-        end
-    end)()
-
-    coroutine.wrap(function()
-        while true do
-            RunService.Heartbeat:Wait()
-            if self.overflowAmount > 0 then
-                for _ = 0,self.overflowAmount,1 do
-                    SchedulerUtils.Wait(0.25)
-                    RemoteEvents.RunBusiness[self.props.name]:FireServer()
+                if self.props.name == "Begging For Robux" then
+                    self:runBusinessMotor()
                 end
-                self.overflowAmount = 0
             end
         end
     end)()

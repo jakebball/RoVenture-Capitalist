@@ -78,7 +78,8 @@ function Businesses:render()
                 amountbuying = self.props.BeggingForRobux.amountbuying,
                 hasmanager = self.props.BeggingForRobux.hasmanager,
                 hiderPosition = self.barVenture1Position,
-                onFinishRun = self.props.onFinishRun
+                dispatchAction = self.props.dispatchAction,
+                playermoney = self.props.money
             })
         }),
 
@@ -110,12 +111,14 @@ end
 
 function Businesses:createBindings()
     self.positionMotor = Flipper.SingleMotor.new(1)
+    self.hiderTransparencyMotor = Flipper.SingleMotor.new(0)
 
     self.backgroundPosition, self.updateBackgroundPosition = Roact.createBinding(self.positionMotor:getValue())
 
     self.positionMotor:onStep(self.updateBackgroundPosition)
-end
 
+    -- self.hiderTransparency = RoactFlipper.getBinding(self.hiderTransparencyMotor)
+end
 
 return RoactRodux.connect(
     function(state)
@@ -123,11 +126,11 @@ return RoactRodux.connect(
             menu = state.menu,
             money = state.playerdata.money,
             BeggingForRobux = {
-                gain = state.business.BeggingForRobux.gain,
-                time = state.business.BeggingForRobux.time,
-                cost = state.business.BeggingForRobux.cost,
-                amountbuying = state.business.BeggingForRobux.amountbuying,
-                hasmanager = state.business.BeggingForRobux.hasmanager,
+                gain = state.business["Begging For Robux"].gain,
+                time = state.business["Begging For Robux"].time,
+                cost = state.business["Begging For Robux"].cost,
+                amountbuying = state.business["Begging For Robux"].amountbuying,
+                hasmanager = state.business["Begging For Robux"].hasmanager,
                 playerOwnsBusiness = true
             }
         }
@@ -135,12 +138,8 @@ return RoactRodux.connect(
 
     function(dispatch)
         return {
-            onFinishRun = function(value)
-                dispatch({
-                   type = "increment",
-                   statname = "money",
-                   value = value
-                })
+            dispatchAction = function(action)
+                dispatch(action)
             end,
         }
     end

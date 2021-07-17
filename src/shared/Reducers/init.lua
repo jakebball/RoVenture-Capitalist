@@ -51,43 +51,27 @@ local playerdataReducer = Rodux.createReducer(initialDataState, {
 })
 
 local initialBusinessState = {
-    BeggingForRobux = {
+    ["Begging For Robux"] = {
         gain = BusinessData.Begging_For_Robux.Initial_Revenue,
         time = BusinessData.Begging_For_Robux.Initial_Time,
         cost = BusinessData.Begging_For_Robux.Initial_Cost,
-        amountbuying = 1,
+        amountowned = 1,
         hasmanager = false,
         playerOwnsBusiness = true,
     }
 }
 
 local businessReducer = Rodux.createReducer(initialBusinessState, {
-    updateGain = function(state, action)
-        
-    end,
 
-    updateTime = function(state, action)
+    incrementAmountOwned = function(state, action)
         local newState = shallowCopy(state)
 
-        -- newState[action.businessname]
+        local newNestedState = shallowCopy(newState[action.businessname])
+        newNestedState.amountowned += action.value
+
+        newState[action.businessname] = newNestedState
 
         return newState
-    end,
-
-    updateCost = function(state, action)
-        
-    end,
-
-    updateAmountbuying = function(state, action)
-        
-    end,
-
-    setManager = function(state, action)
-        
-    end,
-
-    setOwnsBusiness = function(state, action)
-        
     end,
 
     setAllBusiness = function(_, action)

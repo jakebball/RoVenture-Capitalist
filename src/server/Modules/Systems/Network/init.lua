@@ -23,9 +23,7 @@ for _,remote in ipairs(ReplicatedStorage.RemoteEvents.RunBusiness:GetChildren())
 
         local store = DataRunner.getStore(player)
 
-        local businessName = string.gsub(remote.Name, " ", "")
-    
-        local businessState = store:getState().business[businessName]
+        local businessState = store:getState().business[remote.Name]
         
         store:dispatch({
             type = "increment",
@@ -34,6 +32,28 @@ for _,remote in ipairs(ReplicatedStorage.RemoteEvents.RunBusiness:GetChildren())
         })
     end)
 end
+
+ReplicatedStorage.RemoteEvents.BuyItems.BuyBusiness.OnServerEvent:Connect(function(player, businessName)
+    if player:IsDescendantOf(game.Players) then
+        local store = DataRunner.getStore(player)
+
+        local state = store:getState()
+
+        if state.playerdata.money >= state.business[businessName].cost then
+            store:dispatch({
+                type = "incrementAmountOwned",
+                businessname = businessName,
+                value = 1
+            })
+
+            store:dispatch({
+                type = "increment",
+                statname = "money",
+                value = -(state.business[businessName].cost)
+            })
+        end
+    end
+end)
 
 
 

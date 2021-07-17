@@ -5,5 +5,7 @@
     "Lua.diagnostics.globals": [
         "UDim2",
         "task"
-    ]
+    ],
+
+    "rojo.releaseBranch": "7.x"
 }

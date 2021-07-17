@@ -27,14 +27,3 @@ Roact.mount(Roact.createElement(RoactRodux.StoreProvider, {
     App = Roact.createElement(App)
 }), PlayerGui, "RoVenture Capitalist")
 
-RemoteEvents.Updates.UpdateStore.OnClientEvent:Connect(function(newState)
-    store:dispatch({
-        type = "setAllBusiness",
-        newState = newState.business
-    })
-
-    store:dispatch({
-        type = "setAll",
-        stats = newState.playerdata
-    })
-end)

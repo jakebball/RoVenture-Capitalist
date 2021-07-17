@@ -73,10 +73,6 @@ function DataRunner._loadStoreData(player, store)
                 type = "setAll",
                 stats = profile.Data,
             })
-
-            store.changed:connect(function(state)
-                RemoteEvents.Updates.UpdateStore:FireAllClients(state)
-            end)
         else
             profile:Release()
         end
