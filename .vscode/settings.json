@@ -1,6 +1,7 @@
 {
     "Lua.diagnostics.disable": [
-        "incorrect-call-arguments"
+        "incorrect-call-arguments",
+        "redundant-value"
     ],
     "Lua.diagnostics.globals": [
         "UDim2",

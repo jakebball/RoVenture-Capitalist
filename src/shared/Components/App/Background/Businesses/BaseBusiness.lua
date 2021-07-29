@@ -23,6 +23,9 @@ function BaseBusiness:init()
     self.runButtonMotor = Flipper.SingleMotor.new(0)
     self.runButtonBinding = RoactFlipper.getBinding(self.runButtonMotor)
 
+    self.unlockButtonMotor = Flipper.SingleMotor.new(0)
+    self.unlockButtonBinding = RoactFlipper.getBinding(self.unlockButtonMotor)
+    
     self.barMotor = Flipper.SingleMotor.new(0)
     self.barPosition, self.updateBarPosition = Roact.createBinding(self.barMotor:getValue())
     self.barMotor:onStep(self.updateBarPosition)
@@ -64,7 +67,7 @@ function BaseBusiness:render()
             [Roact.Ref] = self.motorRef,
 
             [Roact.Event.MouseButton1Click] = function()
-                if self.props.hasmanager == false then
+                if self.props.hasmanager == false and self.props.amountowned >= 1 then
                     self:runBusinessMotor()
                     self.runButtonMotor:setGoal(Flipper.Spring.new(0, {
                         frequency = 3,
@@ -74,19 +77,45 @@ function BaseBusiness:render()
             end,
 
             [Roact.Event.MouseEnter] = function()
-                self.runButtonMotor:setGoal(Flipper.Spring.new(1, {
-                    frequency = 3,
-                    dampingRatio = 0.85
-                }))
+                if self.props.amountowned >= 1 then
+                    self.runButtonMotor:setGoal(Flipper.Spring.new(1, {
+                        frequency = 3,
+                        dampingRatio = 0.85
+                    }))
+                end
             end,
 
             [Roact.Event.MouseLeave] = function()
-                self.runButtonMotor:setGoal(Flipper.Spring.new(0, {
-                    frequency = 3,
-                    dampingRatio = 0.85
-                }))
+                if self.props.amountowned >= 1 then
+                    self.runButtonMotor:setGoal(Flipper.Spring.new(0, {
+                        frequency = 3,
+                        dampingRatio = 0.85
+                    }))
+                end
             end
-        }),
+        }, {
+            AmountBought = e("ImageLabel", {
+                AnchorPoint = Vector2.new(0.5,0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.5,0,0.821,0),
+                Size = UDim2.new(0.625, 0, 0.262, 0),
+                ZIndex = 4,
+                Image = "rbxassetid://6996354630",
+                ScaleType = Enum.ScaleType.Fit
+            },{
+                AmountBoughtLabel = e("TextLabel", {
+                    AnchorPoint = Vector2.new(0.5,0.5),
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0.5, 0, 0.5, 0),
+                    Size = UDim2.new(1,0,0.8,0),
+                    ZIndex = 5,
+                    Font = Enum.Font.DenkOne,
+                    Text = MathUtil.Shorten(self.props.amountowned),
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextScaled = true
+                })
+            })
+        }), 
 
         Title = e("TextLabel", {
             AnchorPoint = Vector2.new(0.5,0.5),
@@ -163,27 +192,34 @@ function BaseBusiness:render()
             ZIndex = 8,
             
             [Roact.Event.MouseEnter] = function()
-                self.buyButtonMotor:setGoal(Flipper.Spring.new(1, {
-                    frequency = 3,
-                    dampingRatio = 0.85
-                }))
+                if self.props.amountowned >= 1 then
+                    self.buyButtonMotor:setGoal(Flipper.Spring.new(1, {
+                        frequency = 3,
+                        dampingRatio = 0.85
+                    }))
+                end
             end,
 
             [Roact.Event.MouseLeave] = function()
-                self.buyButtonMotor:setGoal(Flipper.Spring.new(0, {
-                    frequency = 3,
-                    dampingRatio = 0.85
-                }))
+                if self.props.amountowned >= 1 then
+                    self.buyButtonMotor:setGoal(Flipper.Spring.new(0, {
+                        frequency = 3,
+                        dampingRatio = 0.85
+                    }))
+                end
             end,
 
             [Roact.Event.MouseButton1Click] = function()
-                if self.props.playermoney >= self.props.cost then
-                    RemoteEvents.BuyItems.BuyBusiness:FireServer(self.props.name)
-                    
+                if self.props.playermoney >= self.props.cost * self.props.amountbuying and self.props.amountowned >= 1 then
                     self.props.dispatchAction({
                         type = "increment",
                         statname = "money",
-                        value = -(self.props.cost)
+                        value = -(self.props.cost * self.props.amountbuying)
+                    })
+
+                    self.props.dispatchAction({
+                        type = "buyBusiness",
+                        businessname = self.props.name,
                     })
 
                     self.buyButtonMotor:setGoal(Flipper.Spring.new(0, {
@@ -220,7 +256,7 @@ function BaseBusiness:render()
                     Position = UDim2.new(0.734, 0, 0.5, 0),
                     Size = UDim2.new(0.458, 0, 0.802, 0),
                     ZIndex = 7,
-                    Text = MathUtil.Shorten(self.props.cost).."$",
+                    Text = MathUtil.Shorten(self.props.cost * self.props.amountbuying).."$",
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextScaled = true,
                     Font = Enum.Font.DenkOne
@@ -242,6 +278,82 @@ function BaseBusiness:render()
             Font = Enum.Font.DenkOne
         }, {
             UICorner = e("UICorner")
+        }),
+
+        Locked = (self.props.amountowned == 0) and e("Frame", {
+            BackgroundTransparency = 0.1,
+            BackgroundColor3 = Color3.fromRGB(80,80,80),
+            Size = UDim2.new(1,0,1,0),
+            ZIndex = 10,
+        }, {
+            UICorner = e("UICorner"),
+
+            ImageButton = e("ImageButton", {
+                AnchorPoint = Vector2.new(0.5,0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.288, 0, 0.5, 0),
+                Size = self.unlockButtonBinding:map(function(newValue)
+                    return UDim2.new(0.566, 0, 0.9, 0):Lerp(UDim2.new(0.566, 0, 0.951, 0), newValue)
+                end),
+                ZIndex = 11,
+                Image = "rbxassetid://6996354725",
+                ScaleType = Enum.ScaleType.Fit,
+
+                [Roact.Event.MouseEnter] = function()
+                    self.unlockButtonMotor:setGoal(Flipper.Spring.new(1, {
+                        frequency = 3,
+                        dampingRatio = 0.85
+                    }))
+                end,
+    
+                [Roact.Event.MouseLeave] = function()
+                    self.unlockButtonMotor:setGoal(Flipper.Spring.new(0, {
+                        frequency = 3,
+                        dampingRatio = 0.85
+                    }))
+                end,
+
+                [Roact.Event.MouseButton1Click] = function()
+                    if self.props.playermoney >= self.props.cost then
+                        self.props.dispatchAction({
+                            type = "buyFirstBusiness",
+                            businessname = self.props.name
+                        })
+
+                        self.props.dispatchAction({
+                            type = "increment",
+                            statname = "money",
+                            value = -self.props.cost
+                        })
+
+                        self.unlockButtonMotor:setGoal(Flipper.Spring.new(0, {
+                            frequency = 3,
+                            dampingRatio = 0.85
+                        }))
+                    end
+                end
+            }, {
+                BuyLabel = e("TextLabel", {
+                    AnchorPoint = Vector2.new(0.5,0.5),
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0.5, 0, 0.5, 0),
+                    Size = UDim2.new(0.798, 0, 0.708, 0),
+                    ZIndex = 12,
+                    Font = Enum.Font.DenkOne,
+                    Text = "Buy Business For "..MathUtil.Shorten(self.props.cost).."$",
+                    TextScaled = true,
+                    TextColor3 = Color3.fromRGB(255,255,255)
+                }),
+            }),
+
+            LockedIcon = e("ImageLabel", {
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.612, 0, 0.075, 0),
+                Size = UDim2.new(0.343, 0, 0.844, 0),
+                ZIndex = 12,
+                Image = "rbxassetid://6996354189",
+                ScaleType = Enum.ScaleType.Fit
+            }),
         })
     })
 end
@@ -277,7 +389,7 @@ function BaseBusiness:runBusinessMotor()
             frequency = 3,
             dampingRatio = 0.85
         }))
-        RemoteEvents.RunBusiness[self.props.name]:FireServer()
+
         self.props.dispatchAction({
             type = "increment",
             statname = "money",
@@ -290,12 +402,10 @@ end
 
 function BaseBusiness:didMount()
     coroutine.wrap(function()
-        while RunService.Heartbeat:Wait() do
-            wait(1)
-            if self.props.hasmanager then
-                if self.props.name == "Begging For Robux" then
-                    self:runBusinessMotor()
-                end
+        while true do
+            wait(self.props.time)
+            if self.props.hasmanager == true then
+                self:runBusinessMotor()
             end
         end
     end)()

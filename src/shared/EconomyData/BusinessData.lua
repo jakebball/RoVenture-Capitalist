@@ -2,11 +2,12 @@
     economy formulas:
 
     costOfBusiness = initial cost * (coefficient)^(numberAfterPurchasing - 1)
+    revenue = current revenue + initial revenue 
 ]]
 
 
 return {
-    Begging_For_Robux = {
+    ["Begging For Robux"] = {
         Initial_Cost = 3.738,
         Coefficient = 1.07,
         Initial_Time = 0.6,
@@ -14,7 +15,7 @@ return {
         Initial_Productivity = 1.67
     },
 
-    Selling_Free_Modals = {
+    ["Selling Free Models"] = {
         Initial_Cost = 60,
         Coefficient = 1.15,
         Initial_Time = 3,

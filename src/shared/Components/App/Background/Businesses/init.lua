@@ -5,6 +5,7 @@ local Vendor = ReplicatedStorage.Modules.Vendor
 local Roact = require(Vendor.Roact)
 local RoactRodux = require(Vendor.RoactRodux)
 local Flipper = require(Vendor.Flipper)
+local RoactFlipper = require(Vendor.RoactFlipper)
 local MathUtil = require(Vendor.MathUtil)
 
 local e = Roact.createElement
@@ -72,14 +73,26 @@ function Businesses:render()
 
             BeggingForRobux = e(BaseBusiness, {
                 name = "Begging For Robux",
-                gain = self.props.BeggingForRobux.gain,
-                time = self.props.BeggingForRobux.time,
-                cost = self.props.BeggingForRobux.cost,
-                amountbuying = self.props.BeggingForRobux.amountbuying,
-                hasmanager = self.props.BeggingForRobux.hasmanager,
-                hiderPosition = self.barVenture1Position,
+                gain = self.props.business["Begging For Robux"].gain,
+                time = self.props.business["Begging For Robux"].time,
+                cost = self.props.business["Begging For Robux"].cost,
+                amountowned = self.props.business["Begging For Robux"].amountowned,
+                hasmanager = self.props.business["Begging For Robux"].hasmanager,
                 dispatchAction = self.props.dispatchAction,
-                playermoney = self.props.money
+                playermoney = self.props.money,
+                amountbuying = self.props.amountbuying,
+            }),
+
+            SellingFreeModels = e(BaseBusiness, {
+                name = "Selling Free Models",
+                gain = self.props.business["Selling Free Models"].gain,
+                time = self.props.business["Selling Free Models"].time,
+                cost = self.props.business["Selling Free Models"].cost,
+                amountowned = self.props.business["Selling Free Models"].amountowned,
+                hasmanager = self.props.business["Selling Free Models"].hasmanager,
+                dispatchAction = self.props.dispatchAction,
+                playermoney = self.props.money,
+                amountbuying = self.props.amountbuying,
             })
         }),
 
@@ -92,6 +105,53 @@ function Businesses:render()
             TextColor3 = Color3.fromRGB(255,255,255),
             TextScaled = true
         }),
+
+        AmountBuying = e("ImageLabel", {
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0.851, 0, 0.007, 0),
+            Size = UDim2.new(0.148, 0, 0.137, 0),
+            ZIndex = 3,
+            Rotation = 25,
+            Image = "rbxassetid://7042822718",
+            ScaleType = Enum.ScaleType.Fit
+        }, {
+            AmountBuyingButton = e("TextButton", {
+                AnchorPoint = Vector2.new(0.5,0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.517, 0, 0.468, 0),
+                Rotation = -25,
+                Size = UDim2.new(0.523, 0, 0.594, 0),
+                ZIndex = 4,
+                Font = Enum.Font.DenkOne,
+                Text = self.props.amountbuying.."x",
+                TextColor3 = Color3.fromRGB(76,192,222),
+                TextScaled = true,
+
+                [Roact.Event.MouseButton1Click] = function()
+                    if self.props.amountbuying == 1 then
+                        self.props.dispatchAction({
+                            type = "setAmount",
+                            amount = 3
+                        })
+                    elseif self.props.amountbuying == 3 then
+                        self.props.dispatchAction({
+                            type = "setAmount",
+                            amount = 10
+                        })
+                    elseif self.props.amountbuying == 10 then
+                        self.props.dispatchAction({
+                            type = "setAmount",
+                            amount = 100
+                        })
+                    elseif self.props.amountbuying == 100 then
+                        self.props.dispatchAction({
+                            type = "setAmount",
+                            amount = 1
+                        })
+                    end
+                end,
+            })
+        })
     })
 end
 
@@ -116,23 +176,15 @@ function Businesses:createBindings()
     self.backgroundPosition, self.updateBackgroundPosition = Roact.createBinding(self.positionMotor:getValue())
 
     self.positionMotor:onStep(self.updateBackgroundPosition)
-
-    -- self.hiderTransparency = RoactFlipper.getBinding(self.hiderTransparencyMotor)
 end
 
 return RoactRodux.connect(
     function(state)
         return {
             menu = state.menu,
+            amountbuying = state.business.amountbuying,
             money = state.playerdata.money,
-            BeggingForRobux = {
-                gain = state.business["Begging For Robux"].gain,
-                time = state.business["Begging For Robux"].time,
-                cost = state.business["Begging For Robux"].cost,
-                amountbuying = state.business["Begging For Robux"].amountbuying,
-                hasmanager = state.business["Begging For Robux"].hasmanager,
-                playerOwnsBusiness = true
-            }
+            business = state.business
         }
     end,
 

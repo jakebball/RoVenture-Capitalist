@@ -18,7 +18,7 @@ local function shallowCopy(original)
 end
 
 local menuReducer = Rodux.createReducer("Businesses", {
-    setMenu = function(state, action)
+    setMenu = function(_, action)
         return action.menu
     end
 })
@@ -51,23 +51,37 @@ local playerdataReducer = Rodux.createReducer(initialDataState, {
 })
 
 local initialBusinessState = {
-    ["Begging For Robux"] = {
-        gain = BusinessData.Begging_For_Robux.Initial_Revenue,
-        time = BusinessData.Begging_For_Robux.Initial_Time,
-        cost = BusinessData.Begging_For_Robux.Initial_Cost,
-        amountowned = 1,
-        hasmanager = false,
-        playerOwnsBusiness = true,
-    }
+    ["Begging For Robux"] = {},
+    ["Selling Free Models"] = {},
+    ["amountbuying"] = 1
 }
+
+for k,v in pairs(initialBusinessState) do
+    if k ~= "amountbuying" then
+        v.gain = BusinessData[k].Initial_Revenue
+        v.time = BusinessData[k].Initial_Time
+        v.cost = BusinessData[k].Initial_Cost
+        v.amountowned = 0
+        v.hasmanager = false
+        if k == "Begging For Robux" then
+            v.playerOwnsBusiness = true
+            v.amountowned = 1
+        else
+            v.playerOwnsBusiness = false
+        end
+    end
+end
 
 local businessReducer = Rodux.createReducer(initialBusinessState, {
 
-    incrementAmountOwned = function(state, action)
+    buyBusiness = function(state, action)
         local newState = shallowCopy(state)
 
         local newNestedState = shallowCopy(newState[action.businessname])
-        newNestedState.amountowned += action.value
+
+        newNestedState.gain += BusinessData[action.businessname].Initial_Revenue
+        newNestedState.cost = BusinessData[action.businessname].Initial_Cost * BusinessData[action.businessname].Coefficient^((newNestedState.amountowned + newState.amountbuying) - 1)
+        newNestedState.amountowned += newState.amountbuying
 
         newState[action.businessname] = newNestedState
 
@@ -76,6 +90,25 @@ local businessReducer = Rodux.createReducer(initialBusinessState, {
 
     setAllBusiness = function(_, action)
         return action.newState
+    end,
+
+    setAmount = function(state, action)
+        local newState = shallowCopy(state)
+
+        newState.amountbuying = action.amount
+
+        return newState
+    end,
+
+    buyFirstBusiness = function(state, action)
+        local newState = shallowCopy(state)
+
+        local newNestedState = shallowCopy(newState[action.businessname])
+        newNestedState.amountowned = 1
+
+        newState[action.businessname] = newNestedState
+
+        return newState
     end
 })
 
