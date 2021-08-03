@@ -23,7 +23,7 @@ return {
         Initial_Productivity = 20
     },
 
-    Basic_Item_Trading = {
+    ["Basic Item Trading"] = {
         Initial_Cost = 720,
         Coefficient = 1.14,
         Initial_Time = 6,
@@ -31,7 +31,7 @@ return {
         Initial_Productivity = 90
     },
 
-    Selling_Bad_UGC = {
+    ["Selling Bad UGC"] = {
         Initial_Cost = 8650,
         Coefficient = 1.13,
         Initial_Time = 12,
@@ -39,7 +39,7 @@ return {
         Initial_Productivity = 360
     },
 
-    Developer_Commissions = {
+    ["Developer Commissions"] = {
         Initial_Cost = 8650,
         Coefficient = 1.13,
         Initial_Time = 12,
@@ -47,7 +47,7 @@ return {
         Initial_Productivity = 2160
     },
 
-    Limited_Item_Trading = {
+    ["Limited Item Trading"] = {
         Initial_Cost = 103680,
         Coefficient = 1.12,
         Initial_Time = 24,
@@ -55,7 +55,7 @@ return {
         Initial_Productivity = 6480
     },
 
-    Selling_Frontpage_UGC = {
+    ["Selling Frontpage UGC"] = {
         Initial_Cost = 103680,
         Coefficient = 1.12,
         Initial_Time = 24,
@@ -63,7 +63,7 @@ return {
         Initial_Productivity = 6480
     },
 
-    Selling_Plugins = {
+    ["Selling Plugins"] = {
         Initial_Cost = 1244160,
         Coefficient = 1.11,
         Initial_Time = 96,
@@ -71,7 +71,7 @@ return {
         Initial_Productivity = 6480
     },
 
-    Selling_Game_Maps = {
+    ["Selling Game Maps"] = {
         Initial_Cost = 14929920,
         Coefficient = 1.10,
         Initial_Time = 384,
@@ -79,7 +79,7 @@ return {
         Initial_Productivity = 19440
     },
 
-    Clicking_Games = {
+    ["Make A Clicking Game"] = {
         Initial_Cost = 179159040,
         Coefficient = 1.09,
         Initial_Time = 1536,
@@ -87,7 +87,7 @@ return {
         Initial_Productivity = 58320
     },
 
-    Simulator_Games = {
+    ["Make A Simulator"] = {
         Initial_Cost = 	2149908480,
         Coefficient = 1.08,
         Initial_Time = 6144,
@@ -95,7 +95,7 @@ return {
         Initial_Productivity = 174960
     },
 
-    FPS_Games = {
+    ["Make An FPS Game"] = {
         Initial_Cost = 	25798901760,
         Coefficient = 1.07,
         Initial_Time = 36864,

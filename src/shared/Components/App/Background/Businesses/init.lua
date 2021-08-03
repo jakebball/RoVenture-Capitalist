@@ -14,11 +14,63 @@ local Businesses = Roact.Component:extend("Businesses")
 
 local BaseBusiness = require(script.BaseBusiness)
 
+local BUSINESS_INFO = {
+    {Name = "Begging For Robux"},
+    {Name = "Selling Free Models"},
+    {Name = "Basic Item Trading"},
+    {Name = "Selling Bad UGC"},
+    {Name = "Developer Commissions"},
+    {Name = "Limited Item Trading"},
+    {Name = "Selling Frontpage UGC"},
+    {Name = "Selling Plugins"},
+    {Name = "Selling Game Maps"},
+    {Name = "Make A Clicking Game"},
+    {Name = "Make A Simulator"},
+    {Name = "Make An FPS Game"},
+}
+
 function Businesses:init()
     self:createBindings()
 end
 
 function Businesses:render()
+
+    local pageChildren = {}
+    local pageNumber = 0
+
+    for index,business in ipairs(BUSINESS_INFO) do
+        local isMultiple = (index % 8) == 0 
+        if isMultiple or pageNumber == 0 then
+            pageNumber += 1
+            pageChildren[pageNumber] = {}
+        end
+
+        pageChildren[pageNumber][business.Name] = e(BaseBusiness, {
+            name = business.Name,
+            gain = self.props.business[business.Name].gain,
+            time = self.props.business[business.Name].time,
+            cost = self.props.business[business.Name].cost,
+            amountowned = self.props.business[business.Name].amountowned,
+            hasmanager = self.props.business[business.Name].hasmanager,
+            dispatchAction = self.props.dispatchAction,
+            playermoney = self.props.money,
+            amountbuying = self.props.amountbuying,
+            layoutorder = index,
+            unlocks = self.props.unlocks,
+            notify = self.props.notify
+        })
+    end
+
+    for _,v in ipairs(pageChildren) do
+        v.UIListLayout = e("UIGridLayout", {
+            CellPadding = UDim2.new(0.05, 0, 0.06, 0),
+            CellSize = UDim2.new(0.45, 0, 0.2, 0),
+            HorizontalAlignment = Enum.HorizontalAlignment.Center,
+            StartCorner = Enum.StartCorner.TopLeft,
+            SortOrder = Enum.SortOrder.LayoutOrder,
+        })
+    end
+
     return e("Frame", {
         AnchorPoint = Vector2.new(0.5,0.5),
         BackgroundTransparency = 1,
@@ -63,38 +115,8 @@ function Businesses:render()
             AnchorPoint = Vector2.new(0.5, 0.5),
             BackgroundTransparency = 1,
             Position = UDim2.new(0.5, 0, 0.557, 0),
-            Size = UDim2.new(0.952, 0, 0.825, 0)
-        }, {
-            UIGridLayout = e("UIGridLayout", {
-                CellPadding = UDim2.new(0.05, 0, 0, 0),
-                CellSize = UDim2.new(0.45, 0, 0.2, 0),
-                HorizontalAlignment = Enum.HorizontalAlignment.Center
-            }),
-
-            BeggingForRobux = e(BaseBusiness, {
-                name = "Begging For Robux",
-                gain = self.props.business["Begging For Robux"].gain,
-                time = self.props.business["Begging For Robux"].time,
-                cost = self.props.business["Begging For Robux"].cost,
-                amountowned = self.props.business["Begging For Robux"].amountowned,
-                hasmanager = self.props.business["Begging For Robux"].hasmanager,
-                dispatchAction = self.props.dispatchAction,
-                playermoney = self.props.money,
-                amountbuying = self.props.amountbuying,
-            }),
-
-            SellingFreeModels = e(BaseBusiness, {
-                name = "Selling Free Models",
-                gain = self.props.business["Selling Free Models"].gain,
-                time = self.props.business["Selling Free Models"].time,
-                cost = self.props.business["Selling Free Models"].cost,
-                amountowned = self.props.business["Selling Free Models"].amountowned,
-                hasmanager = self.props.business["Selling Free Models"].hasmanager,
-                dispatchAction = self.props.dispatchAction,
-                playermoney = self.props.money,
-                amountbuying = self.props.amountbuying,
-            })
-        }),
+            Size = UDim2.new(0.952, 0, 0.825, 0),
+        },pageChildren[self.props.business.currentpage]),
 
         MoneyAmount = e("TextLabel", {
             BackgroundTransparency = 1,
@@ -151,6 +173,92 @@ function Businesses:render()
                     end
                 end,
             })
+        }),
+
+        LeftPageButton = e("ImageButton", {
+            AnchorPoint = Vector2.new(0.5,0.5),
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0.756, 0, 0.072, 0),
+            Rotation = 180,
+            Size = self.leftButtonBinding:map(function(newValue)
+                return UDim2.new(0.044, 0, 0.066, 0):Lerp(UDim2.new(0.044 * 1.2, 0, 0.066 * 1.2, 0), newValue) 
+            end),
+            ZIndex = 3,
+            Image = "rbxassetid://6996353641",
+            ScaleType = Enum.ScaleType.Fit,
+
+            [Roact.Event.MouseEnter] = function()
+                self.leftButtonMotor:setGoal(Flipper.Spring.new(1, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+            end,
+
+            [Roact.Event.MouseLeave] = function()
+                self.leftButtonMotor:setGoal(Flipper.Spring.new(0, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+            end,
+
+            [Roact.Event.MouseButton1Click] = function()
+                self.leftButtonMotor:setGoal(Flipper.Spring.new(0, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+
+                self.props.dispatchAction({
+                    type = "decrementBusinessPage",
+                })
+            end
+        }),
+
+        RigthPageButton = e("ImageButton", {
+            AnchorPoint = Vector2.new(0.5,0.5),
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0.824, 0, 0.072, 0),
+            Rotation = 0,
+            Size = self.rightButtonBinding:map(function(newValue)
+                return UDim2.new(0.044, 0, 0.066, 0):Lerp(UDim2.new(0.044 * 1.2, 0, 0.066 * 1.2, 0), newValue) 
+            end),
+            ZIndex = 3,
+            Image = "rbxassetid://6996353641",
+            ScaleType = Enum.ScaleType.Fit,
+
+            [Roact.Event.MouseEnter] = function()
+                self.rightButtonMotor:setGoal(Flipper.Spring.new(1, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+            end,
+
+            [Roact.Event.MouseLeave] = function()
+                self.rightButtonMotor:setGoal(Flipper.Spring.new(0, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+            end,
+
+            [Roact.Event.MouseButton1Click] = function()
+                self.rightButtonMotor:setGoal(Flipper.Spring.new(0, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+                self.props.dispatchAction({
+                    type = "incrementBusinessPage",
+                })
+            end
+        }),
+
+        CurrentPage = e("TextLabel", {
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0.778, 0, 0.042, 0),
+            Size = UDim2.new(0.026, 0, 0.066, 0),
+            ZIndex = 3,
+            Font = Enum.Font.DenkOne,
+            Text = self.props.business.currentpage,
+            TextColor3 = Color3.fromRGB(255,255,255),
+            TextScaled = true
         })
     })
 end
@@ -172,8 +280,12 @@ end
 function Businesses:createBindings()
     self.positionMotor = Flipper.SingleMotor.new(1)
     self.hiderTransparencyMotor = Flipper.SingleMotor.new(0)
+    self.leftButtonMotor = Flipper.SingleMotor.new(0)
+    self.rightButtonMotor = Flipper.SingleMotor.new(0)
 
     self.backgroundPosition, self.updateBackgroundPosition = Roact.createBinding(self.positionMotor:getValue())
+    self.leftButtonBinding = RoactFlipper.getBinding(self.leftButtonMotor)
+    self.rightButtonBinding = RoactFlipper.getBinding(self.rightButtonMotor)
 
     self.positionMotor:onStep(self.updateBackgroundPosition)
 end
@@ -184,7 +296,8 @@ return RoactRodux.connect(
             menu = state.menu,
             amountbuying = state.business.amountbuying,
             money = state.playerdata.money,
-            business = state.business
+            business = state.business,
+            unlocks = state.playerdata.unlocks
         }
     end,
 

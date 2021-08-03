@@ -7,12 +7,6 @@ local Spring = {}
 Spring.__index = Spring
 
 function Spring.new(targetValue, options)
-
-	if options ~= nil then
-		assert(options.frequency ~= nil, "Incorrrectly formatted options table, must have a frequency key")
-		assert(options.dampingRatio ~= nil, "Incorrrectly formatted options table, must have a dammpingRatio key")
-	end
-
 	assert(targetValue, "Missing argument #1: targetValue")
 	options = options or {}
 

@@ -25,7 +25,8 @@ local menuReducer = Rodux.createReducer("Businesses", {
 
 local initialDataState = {
     money = 0,
-    goldbars = 5,
+    unlocks = {},
+    unlockpage = 1
 }
 
 local playerdataReducer = Rodux.createReducer(initialDataState, {
@@ -48,16 +49,58 @@ local playerdataReducer = Rodux.createReducer(initialDataState, {
 
         return newState
     end,
+
+    giveUnlock = function(state, action)
+        local newState = shallowCopy(state)
+
+        local newUnlocks = shallowCopy(state.unlocks)
+        table.insert(newUnlocks, action.unlock)
+
+        newState.unlocks = newUnlocks
+
+        return newState
+    end,
+
+    incrementUnlockPage = function(state, _)
+        local newState = shallowCopy(state)
+
+        if state.unlockpage < 2 then
+            newState.unlockpage = state.unlockpage + 1
+        end
+
+        return newState
+    end,
+
+    decrementUnlockPage = function(state, _)
+        local newState = shallowCopy(state)
+
+        if state.unlockpage > 1 then
+            newState.unlockpage = state.unlockpage - 1
+        end
+
+        return newState
+    end,
 })
 
 local initialBusinessState = {
     ["Begging For Robux"] = {},
     ["Selling Free Models"] = {},
-    ["amountbuying"] = 1
+    ["Basic Item Trading"] = {},
+    ["Selling Bad UGC"] = {},
+    ["Developer Commissions"] = {},
+    ["Limited Item Trading"] = {},
+    ["Selling Frontpage UGC"] = {},
+    ["Selling Plugins"] = {},
+    ["Selling Game Maps"] = {},
+    ["Make A Clicking Game"] = {},
+    ["Make A Simulator"] = {},
+    ["Make An FPS Game"] = {},
+    ["amountbuying"] = 1,
+    ["currentpage"] = 1
 }
 
 for k,v in pairs(initialBusinessState) do
-    if k ~= "amountbuying" then
+    if k ~= "amountbuying" and k ~= "currentpage" then
         v.gain = BusinessData[k].Initial_Revenue
         v.time = BusinessData[k].Initial_Time
         v.cost = BusinessData[k].Initial_Cost
@@ -77,7 +120,7 @@ local businessReducer = Rodux.createReducer(initialBusinessState, {
     buyBusiness = function(state, action)
         local newState = shallowCopy(state)
 
-        local newNestedState = shallowCopy(newState[action.businessname])
+        local newNestedState = shallowCopy(state[action.businessname])
 
         newNestedState.gain += BusinessData[action.businessname].Initial_Revenue
         newNestedState.cost = BusinessData[action.businessname].Initial_Cost * BusinessData[action.businessname].Coefficient^((newNestedState.amountowned + newState.amountbuying) - 1)
@@ -96,6 +139,26 @@ local businessReducer = Rodux.createReducer(initialBusinessState, {
         local newState = shallowCopy(state)
 
         newState.amountbuying = action.amount
+
+        return newState
+    end,
+
+    incrementBusinessPage = function(state, _)
+        local newState = shallowCopy(state)
+
+        if state.currentpage < 2 then
+            newState.currentpage = state.currentpage + 1
+        end
+
+        return newState
+    end,
+
+    decrementBusinessPage = function(state, _)
+        local newState = shallowCopy(state)
+
+        if state.currentpage > 1 then
+            newState.currentpage = state.currentpage - 1
+        end
 
         return newState
     end,

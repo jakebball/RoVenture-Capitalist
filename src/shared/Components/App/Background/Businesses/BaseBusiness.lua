@@ -10,7 +10,8 @@ local Roact = require(Vendor.Roact)
 local Flipper = require(Vendor.Flipper)
 local RoactFlipper = require(Vendor.RoactFlipper)
 local MathUtil = require(Vendor.MathUtil)
-local SchedulerUtils = require(Vendor.SchedulerUtils)
+
+local UnlockInfo = require(ReplicatedStorage.Modules.EconomyData.UnlockData)
 
 local e = Roact.createElement
 
@@ -40,7 +41,8 @@ end
 function BaseBusiness:render()
     return e("Frame", {
         BackgroundTransparency = 1,
-        ZIndex = 3
+        ZIndex = 3,
+        LayoutOrder = self.props.layoutorder
     }, {
 
         Background = e("ImageLabel", {
@@ -226,6 +228,16 @@ function BaseBusiness:render()
                         frequency = 3,
                         dampingRatio = 0.85
                     }))
+
+                    for _,info in pairs(UnlockInfo[self.props.name]) do
+                        if self.props.amountowned + 1 >= info.Goal and table.find(self.props.unlocks, info.Name) == nil then
+                            self.props.dispatchAction({
+                                type = "giveUnlock",
+                                unlock = info.Name
+                            })
+                            self.props.notify("New Unlock!", info.Name)
+                        end
+                    end
                 end
             end,
 

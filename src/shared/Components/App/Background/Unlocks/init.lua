@@ -5,6 +5,9 @@ local Vendor = ReplicatedStorage.Modules.Vendor
 local Roact = require(Vendor.Roact)
 local RoactRodux = require(Vendor.RoactRodux)
 local Flipper = require(Vendor.Flipper)
+local RoactFlipper = require(Vendor.RoactFlipper)
+
+local UnlockData = require(ReplicatedStorage.Modules.EconomyData.UnlockData)
 
 local e = Roact.createElement
 
@@ -13,13 +16,132 @@ local Unlocks = Roact.Component:extend("Unlocks")
 function Unlocks:init()
 
     self.positionMotor = Flipper.SingleMotor.new(0)
+    self.leftButtonMotor = Flipper.SingleMotor.new(0)
+    self.rightButtonMotor = Flipper.SingleMotor.new(0)
 
     self.backgroundPosition, self.updateBackgroundPosition = Roact.createBinding(self.positionMotor:getValue())
-    
+    self.leftButtonBinding = RoactFlipper.getBinding(self.leftButtonMotor)
+    self.rightButtonBinding = RoactFlipper.getBinding(self.rightButtonMotor)
+
     self.positionMotor:onStep(self.updateBackgroundPosition)
 end
 
 function Unlocks:render()
+    local unlockChildren = {}
+    local pageNumber = 0
+
+    for index,name in ipairs(self.props.unlocks) do
+ 
+        local isMultiple = (index % 10) == 0 
+        if isMultiple or pageNumber == 0 then
+            pageNumber += 1
+            unlockChildren[pageNumber] = {}
+        end
+
+        local goal 
+        local effect
+        local target
+        local amount
+        local description
+
+        for _,v in pairs(UnlockData) do
+            for _,info in ipairs(v) do
+                if info.Name == name then
+                    goal = info.Goal
+                    effect = info.Effect
+                    description = info.Description
+
+                    if info.Target ~= nil then
+                        target = info.Target
+                    end
+
+                    if info.Amount ~= nil then
+                        amount = info.Amount
+                    end
+
+                    break
+                end
+            end
+        end
+
+        unlockChildren[pageNumber][name] = e("Frame",{
+            BackgroundColor3 = Color3.fromRGB(76,192,222),
+            BackgroundTransparency = 0.1,
+            LayoutOrder = index,
+            ZIndex = 3
+        }, {
+            UICorner = e("UICorner"),
+
+            Underline = e("Frame", {
+                AnchorPoint = Vector2.new(0.5,0.5),
+                Position = UDim2.new(0.5, 0, 0.659, 0),
+                Size = UDim2.new(0.716, 0, 0.016, 0),
+                BackgroundColor3 = Color3.fromRGB(255,255,255),
+                ZIndex = 3,
+            }, {
+                UICorner = e("UICorner")
+            }),
+
+            Icon = e("ImageLabel", {
+                AnchorPoint = Vector2.new(0.5,0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.499, 0, 0.346, 0),
+                Size = UDim2.new(0.564, 0, 0.315, 0),
+                Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
+                ScaleType = Enum.ScaleType.Fit,
+                ZIndex = 3,
+            }),
+
+            Title = e("TextLabel", {
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.5, 0, 0.124, 0),
+                Size = UDim2.new(0.84, 0, 0.168, 0),
+                Font = Enum.Font.DenkOne,
+                Text = name,
+                TextColor3 = Color3.fromRGB(255,255,255),
+                TextScaled = true,
+                ZIndex = 3,
+            }),
+
+            Level = e("TextLabel", {
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.5, 0, 0.592, 0),
+                Size = UDim2.new(0.84, 0, 0.118, 0),
+                Font = Enum.Font.DenkOne,
+                Text = "Level "..goal,
+                TextColor3 = Color3.fromRGB(255,255,255),
+                TextScaled = true,
+                ZIndex = 3,
+            }),
+
+            Description = e("TextLabel", {
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.5, 0, 0.813, 0),
+                Size = UDim2.new(0.84, 0, 0.292, 0),
+                Font = Enum.Font.DenkOne,
+                Text = description,
+                TextColor3 = Color3.fromRGB(255,255,255),
+                TextScaled = true,
+                ZIndex = 3
+            }),
+        })
+    end
+
+    for _,v in ipairs(unlockChildren) do
+        v.UICorner = e("UICorner")
+
+        v.UIGridLayout = e("UIGridLayout", {
+            CellPadding = UDim2.new(0.05, 0, 0.05, 0),
+            CellSize = UDim2.new(0.15, 0, 0.45, 0),
+            FillDirection = Enum.FillDirection.Horizontal,
+            HorizontalAlignment = Enum.HorizontalAlignment.Center,
+            VerticalAlignment = Enum.VerticalAlignment.Center
+        })
+    end
+
     return e("Frame", {
         AnchorPoint = Vector2.new(0.5,0.5),
         BackgroundTransparency = 1,
@@ -58,7 +180,101 @@ function Unlocks:render()
                     UICorner = e("UICorner")
                 })
             })
-        })
+        }),
+
+        Main = e("Frame", {
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            BackgroundTransparency = 0.8,
+            Position = UDim2.new(0.5, 0, 0.559, 0),
+            Size = UDim2.new(0.952, 0, 0.82, 0),
+            ZIndex = 2
+        }, unlockChildren[self.props.unlockpage]),
+
+        LeftPageButton = e("ImageButton", {
+            AnchorPoint = Vector2.new(0.5,0.5),
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0.756, 0, 0.072, 0),
+            Rotation = 180,
+            Size = self.leftButtonBinding:map(function(newValue)
+                return UDim2.new(0.044, 0, 0.066, 0):Lerp(UDim2.new(0.044 * 1.2, 0, 0.066 * 1.2, 0), newValue) 
+            end),
+            ZIndex = 3,
+            Image = "rbxassetid://6996353641",
+            ScaleType = Enum.ScaleType.Fit,
+
+            [Roact.Event.MouseEnter] = function()
+                self.leftButtonMotor:setGoal(Flipper.Spring.new(1, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+            end,
+
+            [Roact.Event.MouseLeave] = function()
+                self.leftButtonMotor:setGoal(Flipper.Spring.new(0, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+            end,
+
+            [Roact.Event.MouseButton1Click] = function()
+                self.leftButtonMotor:setGoal(Flipper.Spring.new(0, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+
+                self.props.dispatchAction({
+                    type = "decrementUnlockPage",
+                })
+            end
+        }),
+
+        RightPageButton = e("ImageButton", {
+            AnchorPoint = Vector2.new(0.5,0.5),
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0.824, 0, 0.072, 0),
+            Rotation = 0,
+            Size = self.rightButtonBinding:map(function(newValue)
+                return UDim2.new(0.044, 0, 0.066, 0):Lerp(UDim2.new(0.044 * 1.2, 0, 0.066 * 1.2, 0), newValue) 
+            end),
+            ZIndex = 3,
+            Image = "rbxassetid://6996353641",
+            ScaleType = Enum.ScaleType.Fit,
+
+            [Roact.Event.MouseEnter] = function()
+                self.rightButtonMotor:setGoal(Flipper.Spring.new(1, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+            end,
+
+            [Roact.Event.MouseLeave] = function()
+                self.rightButtonMotor:setGoal(Flipper.Spring.new(0, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+            end,
+
+            [Roact.Event.MouseButton1Click] = function()
+                self.rightButtonMotor:setGoal(Flipper.Spring.new(0, {
+                    frequency = 3,
+                    dampingRatio = 0.85
+                }))
+                self.props.dispatchAction({
+                    type = "incrementUnlockPage",
+                })
+            end
+        }),
+
+        CurrentPage = e("TextLabel", {
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0.778, 0, 0.042, 0),
+            Size = UDim2.new(0.026, 0, 0.066, 0),
+            ZIndex = 3,
+            Font = Enum.Font.DenkOne,
+            Text = self.props.unlockpage,
+            TextColor3 = Color3.fromRGB(255,255,255),
+            TextScaled = true
+        }),
     })
 end
 
@@ -77,17 +293,17 @@ function Unlocks:didUpdate()
 end
 
 return RoactRodux.connect(
-    function(state, props)
+    function(state, _)
         return {
             menu = state.menu,
+            unlocks = state.playerdata.unlocks,
+            unlockpage = state.playerdata.unlockpage
         }
     end,
     function(dispatch)
         return {
-            onClick = function()
-                dispatch({
-                   
-                })
+            dispatchAction = function(action)
+                dispatch(action)
             end,
         }
     end
