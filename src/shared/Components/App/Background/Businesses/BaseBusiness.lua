@@ -233,7 +233,12 @@ function BaseBusiness:render()
                         if self.props.amountowned + 1 >= info.Goal and table.find(self.props.unlocks, info.Name) == nil then
                             self.props.dispatchAction({
                                 type = "giveUnlock",
-                                unlock = info.Name
+                                unlock = info.Name,
+                            })
+                            self.props.dispatchAction({
+                                type = "implementUnlock",
+                                businessname = self.props.name,
+                                unlock = info
                             })
                             self.props.notify("New Unlock!", info.Name)
                         end

@@ -74,7 +74,7 @@ function Unlocks:render()
 
             Underline = e("Frame", {
                 AnchorPoint = Vector2.new(0.5,0.5),
-                Position = UDim2.new(0.5, 0, 0.659, 0),
+                Position = UDim2.new(0.5, 0, 0.77, 0),
                 Size = UDim2.new(0.716, 0, 0.016, 0),
                 BackgroundColor3 = Color3.fromRGB(255,255,255),
                 ZIndex = 3,
@@ -85,7 +85,7 @@ function Unlocks:render()
             Icon = e("ImageLabel", {
                 AnchorPoint = Vector2.new(0.5,0.5),
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0.499, 0, 0.346, 0),
+                Position = UDim2.new(0.499, 0, 0.484, 0),
                 Size = UDim2.new(0.564, 0, 0.315, 0),
                 Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
                 ScaleType = Enum.ScaleType.Fit,
@@ -95,8 +95,8 @@ function Unlocks:render()
             Title = e("TextLabel", {
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0.5, 0, 0.124, 0),
-                Size = UDim2.new(0.84, 0, 0.168, 0),
+                Position = UDim2.new(0.5, 0, 0.173, 0),
+                Size = UDim2.new(0.84, 0, 0.266, 0),
                 Font = Enum.Font.DenkOne,
                 Text = name,
                 TextColor3 = Color3.fromRGB(255,255,255),
@@ -107,7 +107,7 @@ function Unlocks:render()
             Level = e("TextLabel", {
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0.5, 0, 0.592, 0),
+                Position = UDim2.new(0.5, 0, 0.702, 0),
                 Size = UDim2.new(0.84, 0, 0.118, 0),
                 Font = Enum.Font.DenkOne,
                 Text = "Level "..goal,
@@ -119,8 +119,8 @@ function Unlocks:render()
             Description = e("TextLabel", {
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0.5, 0, 0.813, 0),
-                Size = UDim2.new(0.84, 0, 0.292, 0),
+                Position = UDim2.new(0.5, 0, 0.879, 0),
+                Size = UDim2.new(0.84, 0, 0.159, 0),
                 Font = Enum.Font.DenkOne,
                 Text = description,
                 TextColor3 = Color3.fromRGB(255,255,255),

@@ -8,6 +8,7 @@ local EconomyData = ReplicatedStorage.Modules.EconomyData
 local Rodux = require(Vendor.Rodux)
 
 local BusinessData = require(EconomyData.BusinessData)
+local UnlockData = require(EconomyData.UnlockData)
 
 local function shallowCopy(original)
 	local copy = {}
@@ -170,6 +171,22 @@ local businessReducer = Rodux.createReducer(initialBusinessState, {
         newNestedState.amountowned = 1
 
         newState[action.businessname] = newNestedState
+
+        return newState
+    end,
+
+    implementUnlock = function(state, action)
+        local newState = shallowCopy(state)
+
+        local target = action.unlock.Target or action.businessname
+
+        local newNestedState = shallowCopy(newState[target])
+        
+        if action.unlock.Effect == "Speed" then
+            newNestedState.time = state[target].time / 2
+        end
+        
+        newState[target] = newNestedState
 
         return newState
     end

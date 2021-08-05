@@ -121,7 +121,7 @@ function Background:render()
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0.5, 0, 0.243, 0),
-                Size = UDim2.new(0.859, 0, .217, 0),
+                Size = UDim2.new(0.45, 0, .217, 0),
                 ZIndex = 14,
                 Font = Enum.Font.DenkOne,
                 Text = self.notificationSmallTextBinding:map(function(newText)
@@ -135,7 +135,7 @@ function Background:render()
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0.5, 0, 0.609, 0),
-                Size = UDim2.new(0.859, 0, .514, 0),
+                Size = UDim2.new(0.62, 0, .514, 0),
                 ZIndex = 14,
                 Font = Enum.Font.DenkOne,
                 Text = self.notificationLargeTextBinding:map(function(newText)

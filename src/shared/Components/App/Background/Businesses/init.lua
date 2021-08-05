@@ -213,7 +213,7 @@ function Businesses:render()
             end
         }),
 
-        RigthPageButton = e("ImageButton", {
+        RightPageButton = e("ImageButton", {
             AnchorPoint = Vector2.new(0.5,0.5),
             BackgroundTransparency = 1,
             Position = UDim2.new(0.824, 0, 0.072, 0),
