@@ -25,9 +25,12 @@ local menuReducer = Rodux.createReducer("Businesses", {
 })
 
 local initialDataState = {
-    money = 0,
+    money = 360000,
+    moonbucks = 0,
     unlocks = {},
-    unlockpage = 1
+    upgrades = {},
+    currentpage = 1,
+    currentunlockpage = 1,
 }
 
 local playerdataReducer = Rodux.createReducer(initialDataState, {
@@ -62,12 +65,45 @@ local playerdataReducer = Rodux.createReducer(initialDataState, {
         return newState
     end,
 
-    incrementUnlockPage = function(state, _)
+    giveUpgrade = function(state, action)
         local newState = shallowCopy(state)
 
-        if state.unlockpage < 2 then
-            newState.unlockpage = state.unlockpage + 1
+        local newUpgrades = shallowCopy(state.upgrades)
+        table.insert(newUpgrades, action.upgrade)
+
+        newState.upgrades = newUpgrades
+
+        return newState
+    end,
+
+    incrementPage = function(state, _)
+        local newState = shallowCopy(state)
+
+        if state.currentpage < 2 then
+            newState.currentpage = state.currentpage + 1
         end
+
+        return newState
+    end,
+
+    decrementPage = function(state, _)
+        local newState = shallowCopy(state)
+
+        if state.currentpage > 1 then
+            newState.currentpage = state.currentpage - 1
+        end
+
+        return newState
+    end,
+
+    incrementUnlockPage = function(state, _)
+        local newState = shallowCopy(state)
+     
+        if state.currentunlockpage < 2 then
+            newState.currentunlockpage = state.currentunlockpage + 1
+        end
+
+        print(newState.currentunlockpage)
 
         return newState
     end,
@@ -75,8 +111,8 @@ local playerdataReducer = Rodux.createReducer(initialDataState, {
     decrementUnlockPage = function(state, _)
         local newState = shallowCopy(state)
 
-        if state.unlockpage > 1 then
-            newState.unlockpage = state.unlockpage - 1
+        if state.currentunlockpage > 1 then
+            newState.currentunlockpage = state.currentunlockpage - 1
         end
 
         return newState
@@ -86,10 +122,8 @@ local playerdataReducer = Rodux.createReducer(initialDataState, {
 local initialBusinessState = {
     ["Begging For Robux"] = {},
     ["Selling Free Models"] = {},
-    ["Basic Item Trading"] = {},
+    ["Item Trading"] = {},
     ["Selling Bad UGC"] = {},
-    ["Developer Commissions"] = {},
-    ["Limited Item Trading"] = {},
     ["Selling Frontpage UGC"] = {},
     ["Selling Plugins"] = {},
     ["Selling Game Maps"] = {},
@@ -97,11 +131,11 @@ local initialBusinessState = {
     ["Make A Simulator"] = {},
     ["Make An FPS Game"] = {},
     ["amountbuying"] = 1,
-    ["currentpage"] = 1
+    ["maxpage"] = 1
 }
 
 for k,v in pairs(initialBusinessState) do
-    if k ~= "amountbuying" and k ~= "currentpage" then
+    if BusinessData[k] ~= nil then
         v.gain = BusinessData[k].Initial_Revenue
         v.time = BusinessData[k].Initial_Time
         v.cost = BusinessData[k].Initial_Cost
@@ -143,27 +177,7 @@ local businessReducer = Rodux.createReducer(initialBusinessState, {
 
         return newState
     end,
-
-    incrementBusinessPage = function(state, _)
-        local newState = shallowCopy(state)
-
-        if state.currentpage < 2 then
-            newState.currentpage = state.currentpage + 1
-        end
-
-        return newState
-    end,
-
-    decrementBusinessPage = function(state, _)
-        local newState = shallowCopy(state)
-
-        if state.currentpage > 1 then
-            newState.currentpage = state.currentpage - 1
-        end
-
-        return newState
-    end,
-
+    
     buyFirstBusiness = function(state, action)
         local newState = shallowCopy(state)
 
@@ -184,9 +198,35 @@ local businessReducer = Rodux.createReducer(initialBusinessState, {
         
         if action.unlock.Effect == "Speed" then
             newNestedState.time = state[target].time / 2
+        elseif action.unlock.Effect == "Profit" then
+            newNestedState.gain = state[target].gain * action.unlock.Amount
         end
         
         newState[target] = newNestedState
+
+        return newState
+    end,
+
+    implementUpgrade = function(state, action)
+        local newState = shallowCopy(state)
+
+        local target = action.upgrade.Target 
+
+        local newNestedState = shallowCopy(newState[target])
+        
+        if action.upgrade.Effect == "Profit" then
+            newNestedState.gain = state[target].gain * action.upgrade.Amount
+        end
+        
+        newState[target] = newNestedState
+
+        return newState
+    end,
+    
+    set = function(state, action)
+        local newState = shallowCopy(state)
+
+        newState[action.statname] = action.value
 
         return newState
     end
@@ -197,3 +237,18 @@ return {
     playerdataReducer = playerdataReducer, 
     businessReducer = businessReducer
 }
+
+--[[
+      "You Gotta Start Somewhere",
+        "Some Money Is Better Then No Money, Right?",
+        "Getting The Job Done",
+        "Average Beggar",
+        "Beggars Cant Be Choosers",
+        "Respected...For A Beggar",
+        "Optimistic",
+        "Choosers Can Be Beggars?",
+        "Who Needs To Beg When You Got Family - Dom Torbego",
+        "Smooth Talker",
+        "Fastest Beggar In The West",
+        "Kingpin....Of Begging"
+]]

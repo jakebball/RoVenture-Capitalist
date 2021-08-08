@@ -6,6 +6,7 @@ local Roact = require(Vendor.Roact)
 local RoactRodux = require(Vendor.RoactRodux)
 local Flipper = require(Vendor.Flipper)
 local RoactFlipper = require(Vendor.RoactFlipper)
+local MathUtil = require(Vendor.MathUtil)
 
 local UnlockData = require(ReplicatedStorage.Modules.EconomyData.UnlockData)
 
@@ -29,107 +30,93 @@ end
 function Unlocks:render()
     local unlockChildren = {}
     local pageNumber = 0
+    local maxPageNumber = 0
+    local index = 0
 
-    for index,name in ipairs(self.props.unlocks) do
- 
-        local isMultiple = (index % 10) == 0 
-        if isMultiple or pageNumber == 0 then
-            pageNumber += 1
-            unlockChildren[pageNumber] = {}
-        end
+    for _,unlocks in pairs(UnlockData) do
+        for _,unlock in ipairs(unlocks) do
+            index += 1
 
-        local goal 
-        local effect
-        local target
-        local amount
-        local description
-
-        for _,v in pairs(UnlockData) do
-            for _,info in ipairs(v) do
-                if info.Name == name then
-                    goal = info.Goal
-                    effect = info.Effect
-                    description = info.Description
-
-                    if info.Target ~= nil then
-                        target = info.Target
-                    end
-
-                    if info.Amount ~= nil then
-                        amount = info.Amount
-                    end
-
-                    break
-                end
+            local isMultiple = (index % 11) == 0 
+            if isMultiple or pageNumber == 0 then
+                pageNumber += 1
+                maxPageNumber += 1
+                unlockChildren[pageNumber] = {}
             end
-        end
 
-        unlockChildren[pageNumber][name] = e("Frame",{
-            BackgroundColor3 = Color3.fromRGB(76,192,222),
-            BackgroundTransparency = 0.1,
-            LayoutOrder = index,
-            ZIndex = 3
-        }, {
-            UICorner = e("UICorner"),
-
-            Underline = e("Frame", {
-                AnchorPoint = Vector2.new(0.5,0.5),
-                Position = UDim2.new(0.5, 0, 0.77, 0),
-                Size = UDim2.new(0.716, 0, 0.016, 0),
-                BackgroundColor3 = Color3.fromRGB(255,255,255),
-                ZIndex = 3,
-            }, {
-                UICorner = e("UICorner")
-            }),
-
-            Icon = e("ImageLabel", {
-                AnchorPoint = Vector2.new(0.5,0.5),
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0.499, 0, 0.484, 0),
-                Size = UDim2.new(0.564, 0, 0.315, 0),
-                Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-                ScaleType = Enum.ScaleType.Fit,
-                ZIndex = 3,
-            }),
-
-            Title = e("TextLabel", {
-                AnchorPoint = Vector2.new(0.5, 0.5),
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0.5, 0, 0.173, 0),
-                Size = UDim2.new(0.84, 0, 0.266, 0),
-                Font = Enum.Font.DenkOne,
-                Text = name,
-                TextColor3 = Color3.fromRGB(255,255,255),
-                TextScaled = true,
-                ZIndex = 3,
-            }),
-
-            Level = e("TextLabel", {
-                AnchorPoint = Vector2.new(0.5, 0.5),
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0.5, 0, 0.702, 0),
-                Size = UDim2.new(0.84, 0, 0.118, 0),
-                Font = Enum.Font.DenkOne,
-                Text = "Level "..goal,
-                TextColor3 = Color3.fromRGB(255,255,255),
-                TextScaled = true,
-                ZIndex = 3,
-            }),
-
-            Description = e("TextLabel", {
-                AnchorPoint = Vector2.new(0.5, 0.5),
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0.5, 0, 0.879, 0),
-                Size = UDim2.new(0.84, 0, 0.159, 0),
-                Font = Enum.Font.DenkOne,
-                Text = description,
-                TextColor3 = Color3.fromRGB(255,255,255),
-                TextScaled = true,
+            unlockChildren[pageNumber][unlock.Name] = e("Frame",{
+                BackgroundColor3 = Color3.fromRGB(76,192,222),
+                BackgroundTransparency = 0.1,
+                LayoutOrder = index,
                 ZIndex = 3
-            }),
-        })
+            }, {
+                UICorner = e("UICorner"),
+    
+                Underline = e("Frame", {
+                    AnchorPoint = Vector2.new(0.5,0.5),
+                    Position = UDim2.new(0.5, 0, 0.77, 0),
+                    Size = UDim2.new(0.716, 0, 0.016, 0),
+                    BackgroundColor3 = Color3.fromRGB(255,255,255),
+                    ZIndex = 3,
+                }, {
+                    UICorner = e("UICorner")
+                }),
+    
+                Icon = e("ImageLabel", {
+                    AnchorPoint = Vector2.new(0.5,0.5),
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0.499, 0, 0.484, 0),
+                    Size = UDim2.new(0.564, 0, 0.315, 0),
+                    Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
+                    ScaleType = Enum.ScaleType.Fit,
+                    ZIndex = 3,
+                }),
+    
+                Title = e("TextLabel", {
+                    AnchorPoint = Vector2.new(0.5, 0.5),
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0.5, 0, 0.173, 0),
+                    Size = UDim2.new(0.84, 0, 0.266, 0),
+                    Font = Enum.Font.DenkOne,
+                    Text = table.find(self.props.unlocks, unlock.Name) ~= nil and unlock.Name.." (Owned)" or unlock.Name,
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextScaled = true,
+                    ZIndex = 3,
+                }),
+    
+                Level = e("TextLabel", {
+                    AnchorPoint = Vector2.new(0.5, 0.5),
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0.5, 0, 0.702, 0),
+                    Size = UDim2.new(0.84, 0, 0.118, 0),
+                    Font = Enum.Font.DenkOne,
+                    Text = "Level "..unlock.Goal,
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextScaled = true,
+                    ZIndex = 3,
+                }),
+    
+                Description = e("TextLabel", {
+                    AnchorPoint = Vector2.new(0.5, 0.5),
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0.5, 0, 0.879, 0),
+                    Size = UDim2.new(0.84, 0, 0.159, 0),
+                    Font = Enum.Font.DenkOne,
+                    Text = unlock.Description,
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextScaled = true,
+                    ZIndex = 3
+                }),
+            })
+        end
     end
 
+    self.props.dispatchAction({
+        type = "set",
+        statname = "maxunlockpage",
+        value = maxPageNumber
+    })
+    
     for _,v in ipairs(unlockChildren) do
         v.UICorner = e("UICorner")
 
@@ -138,7 +125,9 @@ function Unlocks:render()
             CellSize = UDim2.new(0.15, 0, 0.45, 0),
             FillDirection = Enum.FillDirection.Horizontal,
             HorizontalAlignment = Enum.HorizontalAlignment.Center,
-            VerticalAlignment = Enum.VerticalAlignment.Center
+            VerticalAlignment = Enum.VerticalAlignment.Center,
+            StartCorner = Enum.StartCorner.TopLeft,
+            SortOrder = Enum.SortOrder.LayoutOrder
         })
     end
 
@@ -275,6 +264,16 @@ function Unlocks:render()
             TextColor3 = Color3.fromRGB(255,255,255),
             TextScaled = true
         }),
+
+        MoneyAmount = e("TextLabel", {
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0.025, 0, 0.036, 0),
+            Size = UDim2.new(0.22, 0, 0.091, 0),
+            Font = Enum.Font.DenkOne,
+            Text = MathUtil.Shorten(self.props.money).."$",
+            TextColor3 = Color3.fromRGB(255,255,255),
+            TextScaled = true
+        }),
     })
 end
 
@@ -297,7 +296,8 @@ return RoactRodux.connect(
         return {
             menu = state.menu,
             unlocks = state.playerdata.unlocks,
-            unlockpage = state.playerdata.unlockpage
+            unlockpage = state.playerdata.currentunlockpage,
+            money = state.playerdata.money
         }
     end,
     function(dispatch)

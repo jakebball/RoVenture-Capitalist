@@ -23,7 +23,7 @@ return {
         Initial_Productivity = 20
     },
 
-    ["Basic Item Trading"] = {
+    ["Item Trading"] = {
         Initial_Cost = 720,
         Coefficient = 1.14,
         Initial_Time = 6,
@@ -37,22 +37,6 @@ return {
         Initial_Time = 12,
         Initial_Revenue = 4320, 
         Initial_Productivity = 360
-    },
-
-    ["Developer Commissions"] = {
-        Initial_Cost = 8650,
-        Coefficient = 1.13,
-        Initial_Time = 12,
-        Initial_Revenue = 4320, 
-        Initial_Productivity = 2160
-    },
-
-    ["Limited Item Trading"] = {
-        Initial_Cost = 103680,
-        Coefficient = 1.12,
-        Initial_Time = 24,
-        Initial_Revenue = 51,840, 
-        Initial_Productivity = 6480
     },
 
     ["Selling Frontpage UGC"] = {

@@ -17,10 +17,8 @@ local BaseBusiness = require(script.BaseBusiness)
 local BUSINESS_INFO = {
     {Name = "Begging For Robux"},
     {Name = "Selling Free Models"},
-    {Name = "Basic Item Trading"},
+    {Name = "Item Trading"},
     {Name = "Selling Bad UGC"},
-    {Name = "Developer Commissions"},
-    {Name = "Limited Item Trading"},
     {Name = "Selling Frontpage UGC"},
     {Name = "Selling Plugins"},
     {Name = "Selling Game Maps"},
@@ -37,9 +35,17 @@ function Businesses:render()
 
     local pageChildren = {}
     local pageNumber = 0
+    
+    local currentPlanet = "Earth"
+    local currentBackgroundColor = Color3.fromRGB(76, 192, 222)
+
+    if self.props.currentpage == 2 then
+        currentPlanet = "Moon"
+        currentBackgroundColor = Color3.fromRGB(91,91,91)
+    end
 
     for index,business in ipairs(BUSINESS_INFO) do
-        local isMultiple = (index % 8) == 0 
+        local isMultiple = (index % 11) == 0 
         if isMultiple or pageNumber == 0 then
             pageNumber += 1
             pageChildren[pageNumber] = {}
@@ -68,6 +74,12 @@ function Businesses:render()
             HorizontalAlignment = Enum.HorizontalAlignment.Center,
             StartCorner = Enum.StartCorner.TopLeft,
             SortOrder = Enum.SortOrder.LayoutOrder,
+        },{
+            UIAspectRatioConstraint = e("UIAspectRatioConstraint", {
+                AspectRatio = 4.051,
+                AspectType = Enum.AspectType.FitWithinMaxSize,
+                DominantAxis = Enum.DominantAxis.Width
+            })
         })
     end
 
@@ -82,8 +94,9 @@ function Businesses:render()
 
         Background = e("ImageLabel", {
             BackgroundTransparency = 1,
+            ImageColor3 = currentBackgroundColor,
             Size = UDim2.new(1,0,1,0),
-            Image = "rbxassetid://6996355759",
+            Image = "rbxassetid://6996355288",
         }, {
 
             UICorner = e("UICorner", {
@@ -111,12 +124,14 @@ function Businesses:render()
             })
         }),
 
-        Main = e("Frame", {
+        Main = e("ScrollingFrame", {
             AnchorPoint = Vector2.new(0.5, 0.5),
+            CanvasSize = UDim2.new(0,0,1.2,0),
+            BorderSizePixel = 0,
             BackgroundTransparency = 1,
             Position = UDim2.new(0.5, 0, 0.557, 0),
             Size = UDim2.new(0.952, 0, 0.825, 0),
-        },pageChildren[self.props.business.currentpage]),
+        },pageChildren[self.props.currentpage]),
 
         MoneyAmount = e("TextLabel", {
             BackgroundTransparency = 1,
@@ -178,10 +193,10 @@ function Businesses:render()
         LeftPageButton = e("ImageButton", {
             AnchorPoint = Vector2.new(0.5,0.5),
             BackgroundTransparency = 1,
-            Position = UDim2.new(0.756, 0, 0.072, 0),
+            Position = UDim2.new(0.731, 0, 0.072, 0),
             Rotation = 180,
             Size = self.leftButtonBinding:map(function(newValue)
-                return UDim2.new(0.044, 0, 0.066, 0):Lerp(UDim2.new(0.044 * 1.2, 0, 0.066 * 1.2, 0), newValue) 
+                return UDim2.new(0.047, 0, 0.066, 0):Lerp(UDim2.new(0.044 * 1.2, 0, 0.066 * 1.2, 0), newValue) 
             end),
             ZIndex = 3,
             Image = "rbxassetid://6996353641",
@@ -208,7 +223,7 @@ function Businesses:render()
                 }))
 
                 self.props.dispatchAction({
-                    type = "decrementBusinessPage",
+                    type = "decrementPage",
                 })
             end
         }),
@@ -216,10 +231,10 @@ function Businesses:render()
         RightPageButton = e("ImageButton", {
             AnchorPoint = Vector2.new(0.5,0.5),
             BackgroundTransparency = 1,
-            Position = UDim2.new(0.824, 0, 0.072, 0),
+            Position = UDim2.new(0.857, 0, 0.072, 0),
             Rotation = 0,
             Size = self.rightButtonBinding:map(function(newValue)
-                return UDim2.new(0.044, 0, 0.066, 0):Lerp(UDim2.new(0.044 * 1.2, 0, 0.066 * 1.2, 0), newValue) 
+                return UDim2.new(0.041, 0, 0.066, 0):Lerp(UDim2.new(0.044 * 1.2, 0, 0.066 * 1.2, 0), newValue) 
             end),
             ZIndex = 3,
             Image = "rbxassetid://6996353641",
@@ -245,18 +260,18 @@ function Businesses:render()
                     dampingRatio = 0.85
                 }))
                 self.props.dispatchAction({
-                    type = "incrementBusinessPage",
+                    type = "incrementPage",
                 })
             end
         }),
 
         CurrentPage = e("TextLabel", {
             BackgroundTransparency = 1,
-            Position = UDim2.new(0.778, 0, 0.042, 0),
-            Size = UDim2.new(0.026, 0, 0.066, 0),
+            Position = UDim2.new(0.762, 0, 0.042, 0),
+            Size = UDim2.new(0.07, 0, 0.066, 0),
             ZIndex = 3,
             Font = Enum.Font.DenkOne,
-            Text = self.props.business.currentpage,
+            Text = currentPlanet,
             TextColor3 = Color3.fromRGB(255,255,255),
             TextScaled = true
         })
@@ -297,7 +312,8 @@ return RoactRodux.connect(
             amountbuying = state.business.amountbuying,
             money = state.playerdata.money,
             business = state.business,
-            unlocks = state.playerdata.unlocks
+            unlocks = state.playerdata.unlocks,
+            currentpage = state.playerdata.currentpage
         }
     end,
 

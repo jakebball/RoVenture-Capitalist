@@ -122,7 +122,7 @@ function BaseBusiness:render()
         Title = e("TextLabel", {
             AnchorPoint = Vector2.new(0.5,0.5),
             BackgroundTransparency = 0.97,
-            Position = UDim2.new(0.559, 0, 0.028, 0),
+            Position = UDim2.new(0.559, 0, 0.055, 0),
             Size = UDim2.new(0.751, 0, 0.16, 0),
             Font = Enum.Font.DenkOne,
             TextColor3 = Color3.fromRGB(255,255,255),
@@ -216,7 +216,7 @@ function BaseBusiness:render()
                     self.props.dispatchAction({
                         type = "increment",
                         statname = "money",
-                        value = -(self.props.cost * self.props.amountbuying)
+                        value = -self.props.cost
                     })
 
                     self.props.dispatchAction({
@@ -410,7 +410,7 @@ function BaseBusiness:runBusinessMotor()
         self.props.dispatchAction({
             type = "increment",
             statname = "money",
-            value = self.props.gain
+            value = self.props.gain 
          })
     end) 
 
