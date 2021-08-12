@@ -8,9 +8,9 @@ local Flipper = require(Vendor.Flipper)
 
 local e = Roact.createElement
 
-local Shop = Roact.Component:extend("Shop")
+local Donate = Roact.Component:extend("Donate")
 
-function Shop:init()
+function Donate:init()
 
     self.positionMotor = Flipper.SingleMotor.new(0)
 
@@ -19,7 +19,7 @@ function Shop:init()
     self.positionMotor:onStep(self.updateBackgroundPosition)
 end
 
-function Shop:render()
+function Donate:render()
     return e("Frame", {
         AnchorPoint = Vector2.new(0.5,0.5),
         BackgroundTransparency = 1,
@@ -46,7 +46,7 @@ function Shop:render()
                 Position = UDim2.new(0.5, 0, 0.07, 0),
                 Size = UDim2.new(0.39, 0, 0.114, 0),
                 Font = Enum.Font.DenkOne,
-                Text = "Shop",
+                Text = "Donate",
                 TextColor3 = Color3.fromRGB(255,255,255),
                 TextScaled = true
             }, {
@@ -63,8 +63,8 @@ function Shop:render()
     })
 end
 
-function Shop:didUpdate()
-    if self.props.menu == "Shop" then
+function Donate:didUpdate()
+    if self.props.menu == "Donate" then
         self.positionMotor:setGoal(Flipper.Spring.new(1, {
             frequency = self.props.frequency,
             dampingRatio = self.props.dampingRatio
@@ -92,4 +92,4 @@ return RoactRodux.connect(
             end,
         }
     end
-)(Shop)
+)(Donate)

@@ -5,10 +5,15 @@ local Vendor = ReplicatedStorage.Modules.Vendor
 local Roact = require(Vendor.Roact)
 local RoactRodux = require(Vendor.RoactRodux)
 local Flipper = require(Vendor.Flipper)
+local MathUtil = require(Vendor.MathUtil)
 
 local e = Roact.createElement
 
 local Managers = Roact.Component:extend("Managers")
+
+local ManagerFrame = require(script.ManagerFrame)
+
+local ManagerData = require(ReplicatedStorage.Modules.EconomyData.ManagerData)
 
 function Managers:init()
 
@@ -20,6 +25,31 @@ function Managers:init()
 end
 
 function Managers:render()
+
+    local managerChildren = {}
+
+    for index,manager in ipairs(ManagerData) do
+        managerChildren[manager.Name] = e(ManagerFrame, {
+            layoutorder = index,
+            Managers = self.props.managers,
+            Manager = manager,
+            playermoney = self.props.playermoney,
+            dispatchAction = self.props.dispatchAction
+        })
+    end
+
+    managerChildren.UICorner = e("UICorner")
+
+    managerChildren.UIGridLayout = e("UIGridLayout", {
+        CellPadding = UDim2.new(0.05, 0, 0.05, 0),
+        CellSize = UDim2.new(0.15, 0, 0.45, 0),
+        FillDirection = Enum.FillDirection.Horizontal,
+        HorizontalAlignment = Enum.HorizontalAlignment.Center,
+        SortOrder = "LayoutOrder",
+        StartCorner = "TopLeft",
+        VerticalAlignment = "Center"
+    })
+
     return e("Frame", {
         AnchorPoint = Vector2.new(0.5,0.5),
         BackgroundTransparency = 1,
@@ -57,7 +87,25 @@ function Managers:render()
                 }, {
                     UICorner = e("UICorner")
                 })
-            })
+            }),
+
+            Main = e("Frame", {
+                AnchorPoint = Vector2.new(0.5,0.5),
+                BackgroundTransparency = 0.8,
+                Position = UDim2.new(0.5, 0,0.559, 0),
+                Size = UDim2.new(0.952, 0, 0.82, 0),
+                ZIndex = 6,
+            }, managerChildren),
+
+            MoneyAmount = e("TextLabel", {
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.025, 0, 0.036, 0),
+                Size = UDim2.new(0.22, 0, 0.091, 0),
+                Font = Enum.Font.DenkOne,
+                Text = MathUtil.Shorten(self.props.playermoney).."$",
+                TextColor3 = Color3.fromRGB(255,255,255),
+                TextScaled = true
+            }),
         })
     })
 end
@@ -80,14 +128,14 @@ return RoactRodux.connect(
     function(state, props)
         return {
             menu = state.menu,
+            playermoney = state.playerdata.money,
+            managers = state.playerdata.managers
         }
     end,
     function(dispatch)
         return {
-            onClick = function()
-                dispatch({
-                   
-                })
+            dispatchAction = function(action)
+                dispatch(action)
             end,
         }
     end

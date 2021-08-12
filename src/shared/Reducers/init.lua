@@ -9,6 +9,7 @@ local Rodux = require(Vendor.Rodux)
 
 local BusinessData = require(EconomyData.BusinessData)
 local UnlockData = require(EconomyData.UnlockData)
+local ManagerData = require(EconomyData.ManagerData)
 
 local function shallowCopy(original)
 	local copy = {}
@@ -25,11 +26,14 @@ local menuReducer = Rodux.createReducer("Businesses", {
 })
 
 local initialDataState = {
-    money = 360000,
+    money = 0,
     moonbucks = 0,
     unlocks = {},
     upgrades = {},
-    currentpage = 1,
+    managers = {},
+    maxunlockpage = 0,
+    maxupgradepage = 0,
+    currentupgradepage = 1,
     currentunlockpage = 1,
 }
 
@@ -68,10 +72,21 @@ local playerdataReducer = Rodux.createReducer(initialDataState, {
     giveUpgrade = function(state, action)
         local newState = shallowCopy(state)
 
-        local newUpgrades = shallowCopy(state.upgrades)
+        local newUpgrades = shallowCopy(state.upgrades[action.upgrade])
         table.insert(newUpgrades, action.upgrade)
 
         newState.upgrades = newUpgrades
+
+        return newState
+    end,
+
+    giveManager = function(state, action)
+        local newState = shallowCopy(state)
+
+        local newManagers = shallowCopy(state.managers)
+        table.insert(newManagers, action.manager)
+
+        newState.managers = newManagers
 
         return newState
     end,
@@ -99,11 +114,9 @@ local playerdataReducer = Rodux.createReducer(initialDataState, {
     incrementUnlockPage = function(state, _)
         local newState = shallowCopy(state)
      
-        if state.currentunlockpage < 2 then
+        if state.currentunlockpage < state.maxunlockpage then
             newState.currentunlockpage = state.currentunlockpage + 1
         end
-
-        print(newState.currentunlockpage)
 
         return newState
     end,
@@ -113,6 +126,26 @@ local playerdataReducer = Rodux.createReducer(initialDataState, {
 
         if state.currentunlockpage > 1 then
             newState.currentunlockpage = state.currentunlockpage - 1
+        end
+
+        return newState
+    end,
+    
+    incrementUpgradePage = function(state, _)
+        local newState = shallowCopy(state)
+     
+        if state.currentupgradepage < state.maxupgradepage then
+            newState.currentupgradepage = state.currentupgradepage + 1
+        end
+
+        return newState
+    end,
+
+    decrementUpgradePage = function(state, _)
+        local newState = shallowCopy(state)
+
+        if state.currentupgradepage > 1 then
+            newState.currentupgradepage = state.currentupgradepage - 1
         end
 
         return newState
@@ -213,7 +246,7 @@ local businessReducer = Rodux.createReducer(initialBusinessState, {
         local target = action.upgrade.Target 
 
         local newNestedState = shallowCopy(newState[target])
-        
+    
         if action.upgrade.Effect == "Profit" then
             newNestedState.gain = state[target].gain * action.upgrade.Amount
         end
@@ -222,11 +255,23 @@ local businessReducer = Rodux.createReducer(initialBusinessState, {
 
         return newState
     end,
-    
-    set = function(state, action)
+
+    implementManager = function(state, action)
         local newState = shallowCopy(state)
 
-        newState[action.statname] = action.value
+        local target 
+ 
+        for _,v in ipairs(ManagerData) do
+            if v.Name == action.manager then
+                target = v.Business
+                break
+            end
+        end
+        
+        local newNestedState = shallowCopy(newState[target])
+        newNestedState.hasmanager = true
+        
+        newState[target] = newNestedState
 
         return newState
     end
@@ -237,18 +282,3 @@ return {
     playerdataReducer = playerdataReducer, 
     businessReducer = businessReducer
 }
-
---[[
-      "You Gotta Start Somewhere",
-        "Some Money Is Better Then No Money, Right?",
-        "Getting The Job Done",
-        "Average Beggar",
-        "Beggars Cant Be Choosers",
-        "Respected...For A Beggar",
-        "Optimistic",
-        "Choosers Can Be Beggars?",
-        "Who Needs To Beg When You Got Family - Dom Torbego",
-        "Smooth Talker",
-        "Fastest Beggar In The West",
-        "Kingpin....Of Begging"
-]]

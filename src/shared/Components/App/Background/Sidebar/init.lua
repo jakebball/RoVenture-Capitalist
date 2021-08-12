@@ -12,9 +12,8 @@ local Player = Players.LocalPlayer
 local Unlocks = require(script.UnlocksButton)
 local Upgrades = require(script.UpgradesButton)
 local Managers = require(script.ManagersButton)
-local Investors = require(script.InvestorsButton)
 local Businesses = require(script.BusinessesButton)
-local Shop = require(script.ShopButton)
+local Donate = require(script.DonateButton)
 local LeaderboardButton = require(script.LeaderboardButton)
 
 local e = Roact.createElement
@@ -89,11 +88,9 @@ function Sidebar:render()
 
             Managers = e(Managers),
 
-            Investors = e(Investors),
-
             Businesses = e(Businesses),
 
-            Shop = e(Shop)
+            Donate = e(Donate)
         })
     })
 end

@@ -9,15 +9,17 @@ local e = Roact.createElement
 
 local BaseButton = require(script.Parent.BaseButton)
 
-local Shop = Roact.Component:extend("Shop")
+local Donate = Roact.Component:extend("Donate")
 
-function Shop:render()
+function Donate:render()
     return e(BaseButton, {
-        text = "Shop",
+        text = "Donate",
         image = "rbxassetid://6996353680",
         layoutorder = 6,
 
-        onClick = self.props.onClick
+        onClick = function()
+            game:GetService("MarketplaceService"):PromptProductPurchase(game.Players.LocalPlayer, 1196113658)
+        end
     })
 end
 
@@ -27,14 +29,11 @@ return RoactRodux.connect(
             menu = state.menu
         }
     end,
-    function(dispatch)
+    function()
         return {
             onClick = function()
-                dispatch({
-                    type = "setMenu",
-                    menu = "Shop"
-                })
+                
             end
         }
     end
-)(Shop)
+)(Donate)

@@ -229,18 +229,22 @@ function BaseBusiness:render()
                         dampingRatio = 0.85
                     }))
 
-                    for _,info in pairs(UnlockInfo[self.props.name]) do
-                        if self.props.amountowned + 1 >= info.Goal and table.find(self.props.unlocks, info.Name) == nil then
-                            self.props.dispatchAction({
-                                type = "giveUnlock",
-                                unlock = info.Name,
-                            })
-                            self.props.dispatchAction({
-                                type = "implementUnlock",
-                                businessname = self.props.name,
-                                unlock = info
-                            })
-                            self.props.notify("New Unlock!", info.Name)
+                    for _,unlockIndex in ipairs(UnlockInfo) do
+                        if unlockIndex.UnlockName == self.props.name then
+                            for _,info in ipairs(unlockIndex[self.props.name]) do
+                                if self.props.amountowned + 1 >= info.Goal and table.find(self.props.unlocks, info.Name) == nil then
+                                    self.props.dispatchAction({
+                                        type = "giveUnlock",
+                                        unlock = info.Name,
+                                    })
+                                    self.props.dispatchAction({
+                                        type = "implementUnlock",
+                                        businessname = self.props.name,
+                                        unlock = info
+                                    })
+                                    self.props.notify("New Unlock!", info.Name)
+                                end
+                            end
                         end
                     end
                 end

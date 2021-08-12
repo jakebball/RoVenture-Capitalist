@@ -33,16 +33,15 @@ function Unlocks:render()
     local maxPageNumber = 0
     local index = 0
 
-    for _,unlocks in pairs(UnlockData) do
-        for _,unlock in ipairs(unlocks) do
-            index += 1
-
-            local isMultiple = (index % 11) == 0 
+    for _,unlocks in ipairs(UnlockData) do
+        for _,unlock in ipairs(unlocks[unlocks.UnlockName]) do
+            local isMultiple = (index % 10) == 0 
             if isMultiple or pageNumber == 0 then
                 pageNumber += 1
                 maxPageNumber += 1
                 unlockChildren[pageNumber] = {}
             end
+            index += 1
 
             unlockChildren[pageNumber][unlock.Name] = e("Frame",{
                 BackgroundColor3 = Color3.fromRGB(76,192,222),
@@ -78,7 +77,7 @@ function Unlocks:render()
                     Position = UDim2.new(0.5, 0, 0.173, 0),
                     Size = UDim2.new(0.84, 0, 0.266, 0),
                     Font = Enum.Font.DenkOne,
-                    Text = table.find(self.props.unlocks, unlock.Name) ~= nil and unlock.Name.." (Owned)" or unlock.Name,
+                    Text = unlockText,
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextScaled = true,
                     ZIndex = 3,
@@ -107,6 +106,25 @@ function Unlocks:render()
                     TextScaled = true,
                     ZIndex = 3
                 }),
+
+                LockedFrame = e("Frame", {
+                    BackgroundTransparency = 0.5,
+                    Size = UDim2.new(1,0,1,0),
+                    ZIndex = 6,
+                    Visible = table.find(self.props.unlocks, unlock.Name) == nil
+                }, {
+                    LockedImage = e("ImageLabel", {
+                        AnchorPoint = Vector2.new(0.5, 0.5),
+                        BackgroundTransparency = 1,
+                        Position = UDim2.new(0.5, 0, 0.484, 0),
+                        Size = UDim2.new(0.564, 0, 0.315, 0),
+                        ZIndex = 7,
+                        Image = "rbxassetid://6996354189",
+                        ScaleType = Enum.ScaleType.Fit
+                    }),
+
+                    UICorner = e("UICorner")
+                })
             })
         end
     end

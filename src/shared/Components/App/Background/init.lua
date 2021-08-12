@@ -15,8 +15,7 @@ local Businesses = require(script.Businesses)
 local Unlocks = require(script.Unlocks)
 local Upgrades = require(script.Upgrades)
 local Managers = require(script.Managers)
-local Investors = require(script.Investors)
-local Shop = require(script.Shop)
+local Donate = require(script.Donate)
 local Leaderboard = require(script.Leaderboard)
 
 function Background:init()
@@ -88,13 +87,8 @@ function Background:render()
             dampingRatio = self.props.dampingRatio
         }),
 
-        Investors = e(Investors, {
-            callAnimations = self.props.callAnimation,
-            frequency = self.props.frequency,
-            dampingRatio = self.props.dampingRatio
-        }),
          
-        Shop = e(Shop, {
+        Donate = e(Donate, {
             callAnimations = self.props.callAnimation,
             frequency = self.props.frequency,
             dampingRatio = self.props.dampingRatio
