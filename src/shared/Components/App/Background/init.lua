@@ -16,7 +16,6 @@ local Unlocks = require(script.Unlocks)
 local Upgrades = require(script.Upgrades)
 local Managers = require(script.Managers)
 local Donate = require(script.Donate)
-local Leaderboard = require(script.Leaderboard)
 
 function Background:init()
     self.notificationMotor = Flipper.SingleMotor.new(0)
@@ -86,15 +85,8 @@ function Background:render()
             frequency = self.props.frequency,
             dampingRatio = self.props.dampingRatio
         }),
-
          
         Donate = e(Donate, {
-            callAnimations = self.props.callAnimation,
-            frequency = self.props.frequency,
-            dampingRatio = self.props.dampingRatio
-        }),
-
-        Leaderboard = e(Leaderboard, {
             callAnimations = self.props.callAnimation,
             frequency = self.props.frequency,
             dampingRatio = self.props.dampingRatio

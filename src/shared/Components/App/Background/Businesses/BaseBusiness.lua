@@ -1,7 +1,5 @@
 local ReplicatedStorage = game.ReplicatedStorage
 
-local RemoteEvents = ReplicatedStorage.RemoteEvents
-
 local RunService = game:GetService("RunService")
 
 local Vendor = ReplicatedStorage.Modules.Vendor
@@ -116,6 +114,18 @@ function BaseBusiness:render()
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextScaled = true
                 })
+            }),
+
+            ImageIcon = e("TextLabel", {
+                AnchorPoint = Vector2.new(0.5,0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.5,0,0.5,0),
+                Size = UDim2.new(0.5, 0, 0.4, 0),
+                ZIndex = 4,
+                Text = string.upper(string.sub(self.props.name, 1, 1)),
+                TextScaled = true,
+                Font = Enum.Font.DenkOne,
+                TextColor3 = Color3.fromRGB(255,255,255)
             })
         }), 
 

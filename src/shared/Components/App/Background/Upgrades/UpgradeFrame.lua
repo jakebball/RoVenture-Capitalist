@@ -35,13 +35,16 @@ function UpgradeFrame:render()
     },{
         UICorner = e("UICorner"),
         
-        Icon = e("ImageLabel", {
+        Icon = e("TextLabel", {
             BackgroundTransparency = 1,
             AnchorPoint = Vector2.new(0.5,0.5),
             Position = UDim2.new(0.5,0,0.423,0),
             Size = UDim2.new(0.6, 0, 0.4, 0),
             ZIndex = 5,
-            ScaleType = Enum.ScaleType.Fit
+            Text = string.upper(string.sub(self.props.upgrade.Name, 1, 1)),
+            TextScaled = true,
+            TextColor3 = Color3.fromRGB(255,255,255),
+            Font = Enum.Font.DenkOne
         }),
 
         Title = e("TextLabel", {

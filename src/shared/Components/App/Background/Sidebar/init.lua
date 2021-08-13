@@ -14,7 +14,6 @@ local Upgrades = require(script.UpgradesButton)
 local Managers = require(script.ManagersButton)
 local Businesses = require(script.BusinessesButton)
 local Donate = require(script.DonateButton)
-local LeaderboardButton = require(script.LeaderboardButton)
 
 local e = Roact.createElement
 
@@ -65,8 +64,6 @@ function Sidebar:render()
             }, {
                 WorldModel = e("WorldModel"),
             }),
-
-            LeaderboardButton = e(LeaderboardButton)
         }),
 
         ButtonList = e("Frame", {

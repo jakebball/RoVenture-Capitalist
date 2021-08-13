@@ -61,14 +61,16 @@ function Unlocks:render()
                     UICorner = e("UICorner")
                 }),
     
-                Icon = e("ImageLabel", {
+                Icon = e("TextLabel", {
                     AnchorPoint = Vector2.new(0.5,0.5),
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0.499, 0, 0.484, 0),
                     Size = UDim2.new(0.564, 0, 0.315, 0),
-                    Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-                    ScaleType = Enum.ScaleType.Fit,
                     ZIndex = 3,
+                    Text = string.upper(string.sub(unlock.Name, 1, 1)),
+                    TextScaled =  true,
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    Font = Enum.Font.DenkOne
                 }),
     
                 Title = e("TextLabel", {
