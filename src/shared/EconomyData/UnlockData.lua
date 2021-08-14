@@ -2,7 +2,7 @@ return {
     [1] = {
         UnlockName = "Begging For Robux",
         ["Begging For Robux"] = {
-            {Name = "You Gotta Start Somewhere", Goal = 2, Effect = "Speed", Description = "Double Begging Speed"},
+            {Name = "You Gotta Start Somewhere", Goal = 25, Effect = "Speed", Description = "Double Begging Speed"},
             {Name = "Some Money Is Better Then No Money, Right?", Goal = 50, Effect = "Speed", Description = "Double Begging Speed"},
             {Name = "Getting The Job Done", Goal = 100, Effect = "Speed", Description = "Double Begging Speed"},
             {Name = "Average Beggar", Goal = 200, Effect = "Speed", Description = "Double Begging Speed"},

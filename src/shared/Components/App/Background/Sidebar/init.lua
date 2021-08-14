@@ -14,6 +14,7 @@ local Upgrades = require(script.UpgradesButton)
 local Managers = require(script.ManagersButton)
 local Businesses = require(script.BusinessesButton)
 local Donate = require(script.DonateButton)
+local Save = require(script.SaveButton)
 
 local e = Roact.createElement
 
@@ -87,7 +88,10 @@ function Sidebar:render()
 
             Businesses = e(Businesses),
 
-            Donate = e(Donate)
+            Donate = e(Donate),
+
+            Save = e(Save),
+
         })
     })
 end

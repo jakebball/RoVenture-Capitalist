@@ -32,7 +32,6 @@ function Unlocks:render()
     local pageNumber = 0
     local maxPageNumber = 0
     local index = 0
-
     for _,unlocks in ipairs(UnlockData) do
         for _,unlock in ipairs(unlocks[unlocks.UnlockName]) do
             local isMultiple = (index % 10) == 0 
@@ -79,7 +78,7 @@ function Unlocks:render()
                     Position = UDim2.new(0.5, 0, 0.173, 0),
                     Size = UDim2.new(0.84, 0, 0.266, 0),
                     Font = Enum.Font.DenkOne,
-                    Text = unlockText,
+                    Text = unlock.Name,
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextScaled = true,
                     ZIndex = 3,

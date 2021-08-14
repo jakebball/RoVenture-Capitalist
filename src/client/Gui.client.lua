@@ -21,9 +21,20 @@ local reducer = Rodux.combineReducers({
 
 local store = Rodux.Store.new(reducer)
 
+RemoteEvents.UpdateClientStore.OnClientEvent:Connect(function(newState)
+    store:dispatch({
+        type = "setAll",
+        stats = newState.playerdata
+    })
+
+    store:dispatch({
+        type = "setAllBusiness",
+        newState = newState.business
+    })
+end)
+
 Roact.mount(Roact.createElement(RoactRodux.StoreProvider, {
     store = store
 }, {
     App = Roact.createElement(App)
 }), PlayerGui, "RoVenture Capitalist")
-
