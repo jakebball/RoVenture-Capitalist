@@ -27,7 +27,6 @@ local menuReducer = Rodux.createReducer("Businesses", {
 
 local initialDataState = {
     money = 0,
-    moonbucks = 0,
     unlocks = {},
     upgrades = {},
     managers = {},
